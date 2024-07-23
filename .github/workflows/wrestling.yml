@@ -1,0 +1,41 @@
+name: Get Wrestling Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the current repository
+      uses: actions/checkout@v3
+
+    - name: Clone the private repository
+      env:
+        PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        git clone https://$PERSONAL_ACCESS_TOKEN@github.com/uwaggs/wrestling.git
+
+    - name: release - wrestling_team_rankings
+      id: team_release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          wrestling/womens_team.csv
+          wrestling/mens_team.csv
+        tag_name: wrestling_team_rankings
+        token: ${{ secrets.GH_TOKEN }}
+
+    - name: release - wrestling_athlete_rankings
+      id: athlete_release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          wrestling/womens_athlete.csv
+          wrestling/mens_athlete.csv
+        tag_name: wrestling_athlete_rankings
+        token: ${{ secrets.GH_TOKEN }}
