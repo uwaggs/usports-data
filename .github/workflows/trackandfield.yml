@@ -1,0 +1,71 @@
+name: Get Track and Field Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the current repository
+      uses: actions/checkout@v3
+
+    - name: Clone the private repository
+      env:
+        PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        git clone https://$PERSONAL_ACCESS_TOKEN@github.com/uwaggs/trackandfield.git
+
+    - name: release - tnf_athlete_rankings
+      id: tnf_athlete_rankings
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          trackandfield/tnf_athlete_rankings.csv
+        tag_name: tnf_athlete_rankings
+        token: ${{ secrets.GH_TOKEN }}
+
+
+    - name: release - tnf_meet_results
+      id: tnf_meet_results
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          trackandfield/tnf_meet_results.csv
+        tag_name: tnf_meet_results
+        token: ${{ secrets.GH_TOKEN }}
+
+
+    - name: release - tnf_rosters
+      id: tnf_rosters
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          trackandfield/tnf_rosters.csv
+        tag_name: tnf_rosters
+        token: ${{ secrets.GH_TOKEN }}
+
+
+    - name: release - tnf_team_rankings
+      id: tnf_team_rankings
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          trackandfield/tnf_team_rankings.csv
+        tag_name: tnf_team_rankings
+        token: ${{ secrets.GH_TOKEN }}
+
+
+    - name: release - tnf_universities
+      id: tnf_universities
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          trackandfield/tnf_universities.csv
+        tag_name: tnf_universities
+        token: ${{ secrets.GH_TOKEN }}
+
