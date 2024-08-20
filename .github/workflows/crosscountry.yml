@@ -1,0 +1,61 @@
+name: Get Cross-Country Data
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the current repository
+      uses: actions/checkout@v3
+
+    - name: Clone the private repository
+      env:
+        PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
+      run: |
+        git clone https://$PERSONAL_ACCESS_TOKEN@github.com/uwaggs/crosscountry.git
+    
+    - name: release - xc_meet_results
+      id: xc_meet_results
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          crosscountry/xc_meet_results.csv
+        tag_name: xc_meet_results
+        token: ${{ secrets.GH_TOKEN }}
+
+
+    - name: release - xc_rosters
+      id: xc_rosters
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          crosscountry/xc_rosters.csv
+        tag_name: xc_rosters
+        token: ${{ secrets.GH_TOKEN }}
+
+
+    - name: release - xc_team_rankings
+      id: xc_team_rankings
+      uses: softprops/action-gh-release@v2
+      with:
+        files: |
+          crosscountry/xc_team_rankings.csv
+        tag_name: xc_team_rankings
+        token: ${{ secrets.GH_TOKEN }}
+
+
+    - name: release - xc_universities
+      id: xc_universities
+      uses: softprops/action-gh-release@v2
+      mith:
+        files: |
+          crosscountry/xc_universities.csv
+        tag_name: xc_universities
+        token: ${{ secrets.GH_TOKEN }}
+
