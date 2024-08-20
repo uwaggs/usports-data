@@ -53,7 +53,7 @@ jobs:
     - name: release - xc_universities
       id: xc_universities
       uses: softprops/action-gh-release@v2
-      mith:
+      with:
         files: |
           crosscountry/xc_universities.csv
         tag_name: xc_universities
