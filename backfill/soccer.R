@@ -1,0 +1,40 @@
+library(usportsscaper)
+
+for(link in links) {
+  html <- tryCatch({
+    rvest::read_html(link)
+  }, error = function(e) {
+    return(NULL)
+  })
+
+  start_string <- "boxscores/"
+  end_string <- ".xml"
+
+  pattern <- paste0("(?<=", strat_string, ").*?(?=", end_string, ")")
+  game_id <- stringr::str_extract(link, pattern)
+
+  season = stringr::str_extract(link, "\\d{4}-\\d{2}")
+
+  team_box <- scrape_soc_team_box_score()
+
+  player_box <- scrape_soc_player_box_score()
+
+  pbp <- scrape_soc_play_by_play()
+
+  # add identifier columns
+  team_box$game_id <- game_id
+  team_box$season <- season
+
+  player_box$game_id <- game_id
+  player_box$season <- season
+
+  pbp$game_id <- game_id
+  pbp$season <- season
+
+  # save the data to releases
+  readr::write_csv(team_box, paste0("data/team_box_scores/", season, "/", game_id, "_team_box_score.csv"))
+  readr::write_csv(player_box, paste0("data/player_box_scores/", season, "/", game_id, "_player_box_score.csv"))
+  readr::write_csv(pbp, paste0("data/play_by_play/", season, "/", game_id, "_play_by_play.csv"))
+}
+
+
