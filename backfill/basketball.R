@@ -70,5 +70,35 @@ for(league in leagues) {
     dplyr::group_split() |>
     purrr::walk(~ readr::write_csv(.x, .x$path[1]))
 
+  sapply(
+    unique(all_team_box$season), \(x)
+    piggyback::pb_upload(
+      file = paste0("data/{league}/pbp/{league}_pbp_{season}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_team_box"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_player_box$season), \(x)
+    piggyback::pb_upload(
+      file = paste0("data/{league}/player_box/{league}_player_box_{season}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_player_box"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_pbp$season), \(x)
+    piggyback::pb_upload(
+      file = paste0("data/{league}/team_box/{league}_team_box_{season}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_pbp"),
+      overwrite = TRUE
+    )
+  )
+
 
 
