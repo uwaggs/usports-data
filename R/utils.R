@@ -79,7 +79,7 @@ add_info <- function(df, link) {
   # Add game_id and season to the dataframe
   df$game_id <- game_id
   df$season <- season
-  df$date <- format(game_id, "%Y%m%d")
+  df$date <- stringr::str_extract(game_id, "\\d{8}") |> lubridate::ymd()
   df$sport <- sport
   df$link <- link
 
