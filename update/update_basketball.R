@@ -4,8 +4,10 @@ update_basketball <- function(league = "usports") {
 
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
-  current_season <- if_else(
-
+  current_season <- dplyr::if_else(
+    current_month <= 6,
+    paste0(current_year - 1, "-", substr(current_year, 3, 4)),
+    paste0(current_year, "-", substr(current_year + 1, 3, 4))
   )
 
   leagues <- c("mbkb", "wbkb")

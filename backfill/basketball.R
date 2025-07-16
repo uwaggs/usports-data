@@ -25,7 +25,7 @@ for(league in leagues) {
   all_player_box <- data.frame()
   all_pbp <- data.frame()
 
-  for(link in head(links)) {
+  for(link in links) {
     webpage <- tryCatch({
       rvest::read_html(link)
     }, error = function(e) {
@@ -42,10 +42,6 @@ for(league in leagues) {
     all_player_box <- dplyr::bind_rows(all_player_box, player_box)
     all_pbp <- dplyr::bind_rows(all_pbp, pbp)
   }
-
-  # team_box <- scrape_bkb_team_box_score(html) |> add_info(link)
-  # player_box <- scrape_bkb_player_box_score(html) |> add_info(link)
-  # pbp <- scrape_bkb_play_by_play(html) |> add_info(link)
 
   all_team_box <- dplyr::bind_rows(all_team_box, team_box)
   all_player_box <- dplyr::bind_rows(all_player_box, player_box)
