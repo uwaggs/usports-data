@@ -19,7 +19,7 @@ jobs:
         PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         git clone https://$PERSONAL_ACCESS_TOKEN@github.com/uwaggs/crosscountry.git
-    
+
     - name: release - xc_meet_results
       id: xc_meet_results
       uses: softprops/action-gh-release@v2
