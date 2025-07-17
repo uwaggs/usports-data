@@ -2,8 +2,8 @@ name: Update Basketball Data
 
 on:
   # push:
-  schedule:
-    - cron: ""
+  # schedule:
+  #   - cron: ""
 
 jobs:
   update-basketball:
