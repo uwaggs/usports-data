@@ -82,66 +82,66 @@ updae_football <- function(league = "usports") {
     all_pbp <- dplyr::bind_rows(all_pbp, existing_pbp) |> distinct()
     all_team <- dplyr::bind_rows(all_team, existing_team) |> distinct()
 
-    readr::write_csv(all_returns, paste0("data/", league, "/", league, "_returns.csv"))
-    readr::write_csv(all_kicking, paste0("data/", league, "/", league, "_kicking.csv"))
-    readr::write_csv(all_offence, paste0("data/", league, "/", league, "_offence.csv"))
-    readr::write_csv(all_defence, paste0("data/", league, "/", league, "_defence.csv"))
-    readr::write_csv(all_drive_summaries, paste0("data/", league, "/", league, "_drive_summaries.csv"))
-    readr::write_csv(all_scoring_summaries, paste0("data/", league, "/", league, "_scoring_summaries.csv"))
-    readr::write_csv(all_pbp, paste0("data/", league, "/", league, "_pbp.csv"))
-    readr::write_csv(all_team, paste0("data/", league, "/", league, "_team.csv"))
+    readr::write_csv(all_returns, paste0("data/", league, "/", league, "_returns_", current_season, ".csv"))
+    readr::write_csv(all_kicking, paste0("data/", league, "/", league, "_kicking_", current_season, ".csv"))
+    readr::write_csv(all_offence, paste0("data/", league, "/", league, "_offence_", current_season, ".csv"))
+    readr::write_csv(all_defence, paste0("data/", league, "/", league, "_defence_", current_season, ".csv"))
+    readr::write_csv(all_drive_summaries, paste0("data/", league, "/", league, "_drive_summaries_", current_season, ".csv"))
+    readr::write_csv(all_scoring_summaries, paste0("data/", league, "/", league, "_scoring_summaries_", current_season, ".csv"))
+    readr::write_csv(all_pbp, paste0("data/", league, "/", league, "_pbp_", current_season, ".csv"))
+    readr::write_csv(all_team, paste0("data/", league, "/", league, "_team_", current_season, ".csv"))
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_returns.csv"),
+      file = paste0("data/", league, "/", league, "_returns_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
       tag = "football",
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_kicking.csv"),
+      file = paste0("data/", league, "/", league, "_kicking_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
       tag = "football",
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_offence.csv"),
+      file = paste0("data/", league, "/", league, "_offence_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
       tag = "football",
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_defence.csv"),
+      file = paste0("data/", league, "/", league, "_defence_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
       tag = "football",
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_drive_summaries.csv"),
+      file = paste0("data/", league, "/", league, "_drive_summaries_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
       tag = "football",
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_scoring_summaries.csv"),
+      file = paste0("data/", league, "/", league, "_scoring_summaries_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
       tag = "football",
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_pbp.csv"),
+      file = paste0("data/", league, "/", league, "_pbp_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
       tag = "football",
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_team.csv"),
+      file = paste0("data/", league, "/", league, "_team_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
       tag = "football",
       overwrite = TRUE
