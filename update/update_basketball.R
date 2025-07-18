@@ -1,5 +1,3 @@
-library(usportsscraper)
-
 update_basketball <- function(league = "usports") {
 
   current_year <- as.integer(format(Sys.Date(), "%Y"))
@@ -44,9 +42,9 @@ update_basketball <- function(league = "usports") {
 
     if(is.null(webpage)) next
 
-    team_box <- scrape_bkb_team_box_score(html = webpage) |>  add_info(link)
-    player_box <- scrape_bkb_player_box_score(html = webpage) |> add_info(link)
-    pbp <- scrape_bkb_play_by_play(html = webpage) |> add_info(link)
+    team_box <- usportsscraper::scrape_bkb_team_box_score(html = webpage) |>  add_info(link)
+    player_box <- usportsscraper::scrape_bkb_player_box_score(html = webpage) |> add_info(link)
+    pbp <- usportsscraper::scrape_bkb_play_by_play(html = webpage) |> add_info(link)
 
     all_team_box <- dplyr::bind_rows(all_team_box, team_box)
     all_player_box <- dplyr::bind_rows(all_player_box, player_box)
