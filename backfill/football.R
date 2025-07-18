@@ -29,7 +29,7 @@ for(league in leagues) {
   all_team <- data.frame()
 
 
-  for(link in head(links)) {
+  for(link in links) {
     webpage <- tryCatch({
       rvest::read_html(link)
     }, error = function(e) {
