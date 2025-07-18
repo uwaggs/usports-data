@@ -62,23 +62,23 @@ update_basketball <- function(league = "usports") {
   readr::write_csv(all_pbp, paste0("data/", league, "/", league, "_pbp.csv"))
 
   piggyback::pb_upload(
-    file = paste0("data/", league, "/", league, "team_box.csv"),
+    file = paste0("data/", league, "/", league, "_team_box_", current_season, ".csv"),
     repo = "uwaggs/usports-data",
-    tag = "volleyball",
+    tag = "basketball",
     overwrite = TRUE
   )
 
   piggyback::pb_upload(
-    file = paste0("data/", league, "/", league, "_player_box.csv"),
+    file = paste0("data/", league, "/", league, "_player_box_", current_season, ".csv"),
     repo = "uwaggs/usports-data",
-    tag = "volleyball",
+    tag = "basketball",
     overwrite = TRUE
   )
 
   piggyback::pb_upload(
-    file = paste0("data/", league, "/", league, "_pbp.csv"),
+    file = paste0("data/", league, "/", league, "_pbp_", current_season, ".csv"),
     repo = "uwaggs/usports-data",
-    tag = "volleyball",
+    tag = "basketball",
     overwrite = TRUE
   )
   }
