@@ -64,21 +64,21 @@ update_basketball <- function(league = "usports") {
   piggyback::pb_upload(
     file = paste0("data/", league, "/", league, "team_box.csv"),
     repo = "uwaggs/usports-data",
-    tag = "volleyball",
+    tag = "basketball",
     overwrite = TRUE
   )
 
   piggyback::pb_upload(
     file = paste0("data/", league, "/", league, "_player_box.csv"),
     repo = "uwaggs/usports-data",
-    tag = "volleyball",
+    tag = "basketball",
     overwrite = TRUE
   )
 
   piggyback::pb_upload(
     file = paste0("data/", league, "/", league, "_pbp.csv"),
     repo = "uwaggs/usports-data",
-    tag = "volleyball",
+    tag = "basketball",
     overwrite = TRUE
   )
   }
