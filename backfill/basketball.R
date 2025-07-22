@@ -1,7 +1,3 @@
-library(usportsscraper)
-
-
-# get game id's
 leagues <- c("mbkb", "wbkb")
 
 # links <- readr::read_csv("schedules/mbkb_schedules.csv")
@@ -32,11 +28,11 @@ for(league in leagues) {
       return(NULL)
     })
 
-    if(is.null(html)) next
+    if(is.null(link)) next
 
-    team_box <- scrape_bkb_team_box_score(html = webpage) |> add_info(link)
-    player_box <- scrape_bkb_player_box_score(html = webpage) |> add_info(link)
-    pbp <- scrape_bkb_play_by_play(html = webpage) |> add_info(link)
+    team_box <- usportsscraper::scrape_bkb_team_box_score(html = webpage) |> add_info(link)
+    player_box <- usportsscraper::scrape_bkb_player_box_score(html = webpage) |> add_info(link)
+    pbp <- usportsscraper::scrape_bkb_play_by_play(html = webpage) |> add_info(link)
 
     all_team_box <- dplyr::bind_rows(all_team_box, team_box)
     all_player_box <- dplyr::bind_rows(all_player_box, player_box)
