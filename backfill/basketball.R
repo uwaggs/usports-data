@@ -1,3 +1,4 @@
+source("R/utils.R")
 leagues <- c("mbkb", "wbkb")
 
 # links <- readr::read_csv("schedules/mbkb_schedules.csv")
