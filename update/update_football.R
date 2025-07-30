@@ -12,7 +12,7 @@ updae_football <- function(league = "usports") {
   leagues <- c("mbkb", "wbkb")
 
   for(league in leagues) {
-    schedule <- usportsscraper::scrape_bkb_schedule(
+    schedule <- usportsscraper::scrape_schedule(
       sport = league,
       season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
     )
