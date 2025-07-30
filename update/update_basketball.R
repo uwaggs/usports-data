@@ -1,6 +1,6 @@
 update_basketball <- function(league = "usports") {
 
-  current_year <- as.integer(format(Sys.Date(), "%Y"))
+  current_year <- as.integer(format(Sys.Date(), "%Y")) - 1
   current_month <- lubridate::month(Sys.Date())
   current_season <- dplyr::if_else(
     current_month <= 6,
@@ -10,7 +10,7 @@ update_basketball <- function(league = "usports") {
 
   leagues <- c("mbkb", "wbkb")
 
-  for(league in leagues) {
+  for(league in head(sample(leagues))) {
     schedule <- usportsscraper::scrape_bkb_schedule(
       sport = league,
       season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
