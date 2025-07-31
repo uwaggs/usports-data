@@ -63,17 +63,42 @@ upload_to_release <- function(files,
 
 # helper function to add unique identifying info to dataframes
 
+# normalize_year <- function(x) {
+#     x <- stringr::str_replace(x, "^([0-9]{4}-[0-9]{2})[a-z]$", "\\1")
+#     x <- ifelse(
+#       stringr::str_detect(x, "^20\\d{2}$"),
+#       paste0(
+#         as.integer(stringr::substr(x, 1, 4)) - 1, "-",
+#         stringr::substr(x, 3, 4)
+#       ),
+#       x
+#     )
+#     x
+# }
+
 add_info <- function(df, link) {
 
   # Extract game ID from the link
   start_string <- "boxscores/"
   end_string <- ".xml"
-  pattern <- paste0("(?<=", start_string, ").*?(?=", end_string, ")")
+  pattern <- paste0("b(?<=", start_string, ").*?(?=", end_string, ")")
 
   game_id <- stringr::str_extract(link, pattern)
 
+  pattern_2 <- glue::glue("(?<={league}/)[^/]+")
   # Extract season from the link
-  season <- stringr::str_extract(link, "\\d{4}-\\d{2}")
+  season <- stringr::str_extract(link, pattern_2)
+  season <- ifelse(stringr::str_length(season) > 7, stringr::str_sub(season, 1, 7), season)
+  ifelse(
+    stringr::str_length(season) == 4 & stringr::str_detect(season, "^[0-9]{4}$"),
+    stringr::str_c(
+        as.character(as.integer(season) - 1),
+        "-",
+        stringr::str_sub(season, 3, 4)
+    ),
+    season
+  )
+
   sport <- stringr::str_extract(link, "(?<=sports/)[a-z]+(?=/)")
 
   # Add game_id and season to the dataframe

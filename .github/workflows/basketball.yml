@@ -1,25 +1,26 @@
 name: Update Basketball Data
 
 on:
-  workflow-dispatch:
+  workflow_dispatch:
   # schedule:
   #   - cron: '0 0 * * *'
 
 jobs:
   build:
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
 
       - name: setup R
-      - uses: r-lib/actions/setup-r@v2
-      - with:
+        uses: r-lib/actions/setup-r@v2
+        with:
           use-public-rspm: true
       - name: Package Installation
         uses: r-lib/actions/setup-r-dependencies@v2
-        packages: |
+        with:
+          packages: |
             any::tidyverse
             any::rvest
             any::remotes

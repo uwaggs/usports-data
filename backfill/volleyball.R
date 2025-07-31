@@ -1,105 +1,101 @@
-library(usportsscaper)
-library(tidyverse)
-library(piggyback)
-source("R/utils.R")
-
-# get schedule
-
 leagues <- c("mvball", "wvball")
 
 for(league in leagues) {
-
-  # get schedule
-
-  schedule <- pb_download(
+  piggyback::pb_download(
     file = paste0(league, "_schedules.csv"),
     repo = "uwaggs/usports-data",
     tag = "schedules",
-    pb_dir = "data/schedules"
+    dest = "data/schedules"
   )
 
-  # get game links
-  links <- schedule %>%
-    pull(link) %>%
+  schedule <- readr::read_csv(paste0("data/schedules/", league, "_schedules.csv"))
+
+  links <- schedule |>
+    dplyr::filter(box_scores != "", !is.na(box_scores)) |>
+    dplyr::pull(box_scores) |>
     unique()
 
-  # scrape game data
+  all_team_box <- data.frame()
+  all_player_box <- data.frame()
+  all_pbp <- data.frame()
 
-  all_team_box <- df()
-  all_player_box <- df()
-  all_pbp <- df()
-
-  for(link in links) {
-
+  for(link in head(sample(links))) {
     webpage <- tryCatch({
       rvest::read_html(link)
     }, error = function(e) {
       return(NULL)
     })
 
-    if(is.null(webpage)) next
+    if(is.null(link)) next
 
-    team_box <- scrape_vb_team_box_score(html = webpage) %>% add_info(link)
-    player_box <- scrape_vb_player_box_score(html = webpage) %>% add_info(link)
-    pbp <- scrape_vb_play_by_play(html = webpage)  %>% add_info(link)
+    team_box <- usportsscraper::scrape_vb_team_box_score (html = webpage) |> add_info(link)
+    player_box <- usportsscraper::scrape_vb_player_box_score(html = webpage) |> add_info(link)
+    pbp <- usportsscraper::scrape_vb_play_by_play(html = webpage) |> add_info(link)
 
-    all_team_box <- bind_rows(all_team_box, team_box)
-    all_player_box <- bind_rows(all_player_box, player_box)
-    all_pbp <- bind_rows(all_pbp, pbp)
+    all_team_box <- dplyr::bind_rows(all_team_box, team_box)
+    all_player_box <- dplyr::bind_rows(all_player_box, player_box)
+    all_pbp <- dplyr::bind_rows(all_pbp, pbp)
   }
 
-  # save data
+  all_team_box <- dplyr::bind_rows(all_team_box, team_box)
+  all_player_box <- dplyr::bind_rows(all_player_box, player_box)
+  all_pbp <- dplyr::bind_rows(all_pbp, pbp)
 
-  write_csv(all_team_box, paste0("data/", league, "/",league, "_team_box.csv"))
-  write_csv(all_player_box, paste0("data/", league, "/",league, "_player_box.csv"))
+  all_team_box |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}/team_box/{league}_team_box_{season}.csv")) |>
+    dplyr::group_by(season) |>
+    dplyr::group_split() |>
+    purrr::walk(~ {
+      fs::dir_create(dirname(.x$path[1]))
+      readr::write_csv(.x, .x$path[1])
+    })
 
-  # split up pbp by season and write to file using purrr::walk2
+  all_player_box |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}/player_box/{league}_player_box_{season}.csv")) |>
+    dplyr::group_by(season) |>
+    dplyr::group_split() |>
+    purrr::walk(~ {
+      fs::dir_create(dirname(.x$path[1]))
+      readr::write_csv(.x, .x$path[1])
+    })
 
-  all_pbp %>%
-    group_by(season) %>%
-    group_split() %>%
-    purrr::walk2(
-      .x = paste0("data/", league, "/", league, "_pbp_"),
-      .y = seq_along(.),
-      ~ write_csv(.x, paste0(.y, .x$season[1], ".csv"))
-    )
-
-  write_csv(all_pbp, paste0("data/", league, "/", league, "_pbp.csv"))
-
-  # upload to releases
-  pb_upload(
-    file = paste0("data/", league, "/", league, "_team_box.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_team_box"),
-    overwrite = T
-  )
-
-  pb_upload(
-    file = paste0("data/", league, "/", league, "_player_box.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_player_box"),
-    overwrite = T
-  )
-
-  # pb_upload(
-  #   file = paste0("data/", league, "/", league, "_pbp.csv"),
-  #   repo = "uwaggs/usports-data",
-  #   tag = paste0(league, "_pbp"),
-  #   overwrite = T
-  # )
-
-  sapply(
-  unique(all_pbp$season), \(x)
-  pb_upload(
-    file = paste0("data/", league, "/", league, "_pbp_", x, ".csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_pbp"),
-    overwrite = T
-  )
-  )
-
+  all_pbp |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}/pbp/{league}_pbp_{season}.csv")) |>
+    dplyr::group_by(season) |>
+    dplyr::group_split() |>
+    purrr::walk(~ {
+      fs::dir_create(dirname(.x$path[1]))
+      readr::write_csv(.x, .x$path[1])
+    })
 }
 
+sapply(
+  unique(all_team_box$season), \(x)
+  piggyback::pb_upload(
+    file = glue::glue("data/{league}/pbp/{league}_pbp_{x}.csv"),
+    repo = "uwaggs/usports-data",
+    tag = paste0(league, "_team_box"),
+    overwrite = TRUE
+  )
+)
 
+sapply(
+  unique(all_player_box$season), \(x)
+  piggyback::pb_upload(
+    file = glue::glue("data/{league}/player_box/{league}_player_box_{x}.csv"),
+    repo = "uwaggs/usports-data",
+    tag = paste0(league, "_player_box"),
+    overwrite = TRUE
+  )
+)
 
+sapply(
+  unique(all_pbp$season), \(x)
+  piggyback::pb_upload(
+    file = glue::glue("data/{league}/team_box/{league}_team_box_{x}.csv"),
+    repo = "uwaggs/usports-data",
+    tag = paste0(league, "_pbp"),
+    overwrite = TRUE
+  )
+)
 

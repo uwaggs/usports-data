@@ -21,7 +21,7 @@ for(league in leagues) {
 
   for(link in head(links)) {
     webpage <- tryCatch({
-      rvest::read_html(link)
+      rvest::read_html(link, encoding = "ISO-8859-1")
     }, error = function(e) {
       return(NULL)
     })
