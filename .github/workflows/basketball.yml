@@ -21,10 +21,8 @@ jobs:
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
-            any::tidyverse
-            any::rvest
+            any::pacman
             any::remotes
-            any::piggyback
       - name: usportsR Installation
         run: Rscript -e 'remotes::install_github("uwaggs/usportsscraper")'
         env:
