@@ -1,33 +1,33 @@
-name: Update Fieldhockey Data
+name: Update Field Hockey Data
 
-# on:
-#   push:
-#   schedule:
-#     - cron: '0 0 * * *'
+on:
+  workflow-dispatch:
+  # schedule:
+  #   - cron: '0 0 * * *'
 
 jobs:
-  update-basketball:
-  runs-on: windows-latest
-  env:
-    R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
-      RSPM: ${{ matrix.config.rspm }}
-      GITHUB_PAT: ${{ secrets.NBLR_GH_TOKEN }}
+  build:
+  runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout code
+      - uses: actions/checkout@v3
+
+      - name: setup R
       - uses: r-lib/actions/setup-r@v2
+      - with:
+          use-public-rspm: true
       - name: Package Installation
-        run: Rscript -e 'install.packages(c("dplyr", "purrr", "tidyr", "rvest", "lubridate"))'
+        uses: r-lib/actions/setup-r-dependencies@v2
+        packages: |
+            any::tidyverse
+            any::rvest
+            any::remotes
+            any::piggyback
       - name: usportsR Installation
         run: Rscript -e 'remotes::install_github("uwaggs/usportsscraper")'
-      - name: usportsR Installation
-        run: Rscript -e 'remotes::install_github("uwaggs/usportsscraper")'
+
       - name: Update results
-        run: Rscript -e 'source(file.path("update", "update_results.R"), echo = TRUE)'
-      - name: Update matches
-        run: Rscript -e 'source(file.path("update", "update_matches.R"), echo = TRUE)'
-      - name: Update stats
-        run: Rscript -e 'source(file.path("update", "update_stats.R"), echo = TRUE)'
-      - name: Update stats csv
-        run: Rscript -e 'source(file.path("update", "save_as_csv.R"), echo = TRUE)'
-      - name: Update stats csv
-        run: Rscript -e 'source(file.path("update", "update_nbl_player_bios.R"), echo = TRUE)'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+        run: Rscript -e 'source(file.path("update", "update_fieldhockey.R"), echo = TRUE)'

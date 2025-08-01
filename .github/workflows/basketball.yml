@@ -28,9 +28,9 @@ jobs:
       - name: usportsR Installation
         run: Rscript -e 'remotes::install_github("uwaggs/usportsscraper")'
         env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_PAT: ${{ secrets.GH_TOKEN }}
 
       - name: Update results
         env:
-          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_PAT: ${{ secrets.GH_TOKEN }}
         run: Rscript -e 'source(file.path("update", "update_basketball.R"), echo = TRUE)'
