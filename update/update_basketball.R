@@ -1,7 +1,7 @@
 source("R/utils.R")
 pacman::p_load(tidyverse, piggyback, rvest)
 
-current_year <- as.integer(format(Sys.Date(), "%Y")) - 1
+current_year <- as.integer(format(Sys.Date(), "%Y"))
 current_month <- lubridate::month(Sys.Date())
 current_season <- dplyr::if_else(
   current_month <= 8,

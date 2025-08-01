@@ -23,6 +23,7 @@ jobs:
           packages: |
             any::pacman
             any::remotes
+            any::curl
       - name: usportsR Installation
         run: Rscript -e 'remotes::install_github("uwaggs/usportsscraper")'
         env:
