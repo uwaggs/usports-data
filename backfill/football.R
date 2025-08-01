@@ -12,7 +12,7 @@ for(league in leagues) {
     dest = "data/schedules"
   )
 
-  schedule <- readr::read_csv(paste0("data/schedules/", league, "_schedules.csv"))
+  schedule <- read_file(paste0("data/schedules/", league, "_schedules.csv"))
 
   links <- schedule |>
     dplyr::filter(box_scores != "", !is.na(box_scores)) |>

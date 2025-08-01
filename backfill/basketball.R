@@ -1,7 +1,7 @@
 source("R/utils.R")
 leagues <- c("mbkb", "wbkb")
 
-# links <- readr::read_csv("schedules/mbkb_schedules.csv")
+# links <- read_file("schedules/mbkb_schedules.csv")
 
 for(league in leagues) {
     piggyback::pb_download(
@@ -11,7 +11,7 @@ for(league in leagues) {
     dest = "data/schedules"
   )
 
-  schedule <- readr::read_csv(paste0("data/schedules/", league, "_schedules.csv"))
+  schedule <- read_file(paste0("data/schedules/", league, "_schedules.csv"))
 
   links <- schedule |>
     dplyr::filter(box_scores != "", !is.na(box_scores)) |>

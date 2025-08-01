@@ -1,3 +1,4 @@
+source("R/utils.R")
 leagues <- c("mvball", "wvball")
 
 for(league in leagues) {
@@ -8,7 +9,7 @@ for(league in leagues) {
     dest = "data/schedules"
   )
 
-  schedule <- readr::read_csv(paste0("data/schedules/", league, "_schedules.csv"))
+  schedule <- read_file(paste0("data/schedules/", league, "_schedules.csv"))
 
   links <- schedule |>
     dplyr::filter(box_scores != "", !is.na(box_scores)) |>
@@ -74,7 +75,7 @@ sapply(
   piggyback::pb_upload(
     file = glue::glue("data/{league}/pbp/{league}_pbp_{x}.csv"),
     repo = "uwaggs/usports-data",
-    tag = paste0(league, "_team_box"),
+    tag = paste0(league, "_pbp"),
     overwrite = TRUE
   )
 )
@@ -94,7 +95,7 @@ sapply(
   piggyback::pb_upload(
     file = glue::glue("data/{league}/team_box/{league}_team_box_{x}.csv"),
     repo = "uwaggs/usports-data",
-    tag = paste0(league, "_pbp"),
+    tag = paste0(league, "_team_box"),
     overwrite = TRUE
   )
 )
