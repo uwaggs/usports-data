@@ -1,6 +1,4 @@
-library(usportsscraper)
-
-updae_football <- function(league = "usports") {
+update_football <- function(league = "usports") {
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
   current_season <- dplyr::if_else(
@@ -9,21 +7,21 @@ updae_football <- function(league = "usports") {
     paste0(current_year, "-", substr(current_year + 1, 3, 4))
   )
 
-  leagues <- c("mbkb", "wbkb")
+  leagues <- c("fball")
 
   for(league in leagues) {
     schedule <- usportsscraper::scrape_schedule(
       sport = league,
       season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
     )
-    existing_returns <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_returns_", current_season, ".csv"))
-    existing_kicking <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_kicking_", current_season, ".csv"))
-    existing_offence <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_offence_", current_season, ".csv"))
-    existing_defence <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_defence_", current_season, ".csv"))
-    existing_drive_summaries <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_drive_summaries_", current_season, ".csv"))
-    existing_scoring_summaries <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_scoring_summaries_", current_season, ".csv"))
-    existing_pbp <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_pbp_", current_season, ".csv"))
-    existing_team <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_team_", current_season, ".csv"))
+    existing_returns <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_returns/", league, "_returns_", current_season, ".csv"))
+    existing_kicking <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_kicking/", league, "_kicking_", current_season, ".csv"))
+    existing_offence <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_offence/", league, "_offence_", current_season, ".csv"))
+    existing_defence <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_defence/", league, "_defence_", current_season, ".csv"))
+    existing_drive_summaries <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_drive_summaries/", league, "_drive_summaries_", current_season, ".csv"))
+    existing_scoring_summaries <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_scoring_summaries/", league, "_scoring_summaries_", current_season, ".csv"))
+    existing_pbp <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
+    existing_team <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_team/", league, "_team_", current_season, ".csv"))
 
 
     games_to_scrape <-
@@ -82,9 +80,9 @@ updae_football <- function(league = "usports") {
     all_pbp <- dplyr::bind_rows(all_pbp, existing_pbp) |> distinct()
     all_team <- dplyr::bind_rows(all_team, existing_team) |> distinct()
 
-    readr::write_csv(all_returns, paste0("data/", league, "/", league, "_returns_", current_season, ".csv"))
-    readr::write_csv(all_kicking, paste0("data/", league, "/", league, "_kicking_", current_season, ".csv"))
-    readr::write_csv(all_offence, paste0("data/", league, "/", league, "_offence_", current_season, ".csv"))
+    readr::write_csv(all_returns, paste0("data/", league, "_returns/", league, "_returns_", current_season, ".csv"))
+    readr::write_csv(all_kicking, paste0("data/", league, "_kicking/", league, "_kicking_", current_season, ".csv"))
+    readr::write_csv(all_offence, paste0("data/", league, "_offence/", league, "_offence_", current_season, ".csv"))
     readr::write_csv(all_defence, paste0("data/", league, "/", league, "_defence_", current_season, ".csv"))
     readr::write_csv(all_drive_summaries, paste0("data/", league, "/", league, "_drive_summaries_", current_season, ".csv"))
     readr::write_csv(all_scoring_summaries, paste0("data/", league, "/", league, "_scoring_summaries_", current_season, ".csv"))
@@ -92,58 +90,58 @@ updae_football <- function(league = "usports") {
     readr::write_csv(all_team, paste0("data/", league, "/", league, "_team_", current_season, ".csv"))
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_returns_", current_season, ".csv"),
+      file = paste0("data/", league, "_returns/", league, "_returns_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
-      tag = "football",
+      tag = paste0(league, "_returns"),
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_kicking_", current_season, ".csv"),
+      file = paste0("data/", league, "_kicking/", league, "_kicking_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
-      tag = "football",
+      tag = paste0(league, "_kicking"),
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_offence_", current_season, ".csv"),
+      file = paste0("data/", league, "_offence/", league, "_offence_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
-      tag = "football",
+      tag = paste0(league, "_offence"),
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_defence_", current_season, ".csv"),
+      file = paste0("data/", league, "_defence/", league, "_defence_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
-      tag = "football",
+      tag = paste0(league, "_defence"),
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_drive_summaries_", current_season, ".csv"),
+      file = paste0("data/", league, "_drive_summaries/", league, "_drive_summaries_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
-      tag = "football",
+      tag = paste0(league, "_drive_summaries"),
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_scoring_summaries_", current_season, ".csv"),
+      file = paste0("data/", league, "_scoring_summaries/", league, "_scoring_summaries_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
-      tag = "football",
+      tag = paste0(league, "_scoring_summaries"),
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_pbp_", current_season, ".csv"),
+      file = paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
-      tag = "football",
+      tag = paste0(league, "_pbp"),
       overwrite = TRUE
     )
 
     piggyback::pb_upload(
-      file = paste0("data/", league, "/", league, "_team_", current_season, ".csv"),
+      file = paste0("data/", league, "_team/", league, "_team_", current_season, ".csv"),
       repo = "uwaggs/usports-data",
-      tag = "football",
+      tag = paste0(league, "_team"),
       overwrite = TRUE
     )
   }
