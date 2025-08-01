@@ -32,4 +32,4 @@ jobs:
       - name: Update results
         env:
           GITHUB_PAT: ${{ secrets.GH_TOKEN }}
-        run: Rscript -e 'source(file.path("update", "update_basketball.R"), echo = TRUE)'
+        run: Rscript -e 'source(file.path("update", "test.R"), echo = TRUE)'
