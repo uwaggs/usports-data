@@ -1,3 +1,4 @@
+source("R/utils.R")
 update_fieldhockey <- function(league = "usports") {
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
@@ -13,9 +14,9 @@ update_fieldhockey <- function(league = "usports") {
     sport = league,
     season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
   )
-  existing_team_box <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_team_box_", current_season, ".csv"))
-  existing_player_box <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_player_box_", current_season, ".csv"))
-  existing_pbp <- readr::read_csv(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "/", league, "_pbp_", current_season, ".csv"))
+  existing_team_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_team_box/", league, "_team_box_", current_season,".csv"))
+  existing_player_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_player_box/", league, "_player_box_", current_season,".csv"))
+  existing_pbp <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_pbp/", league, "_pbp_", current_season,".csv"))
 
   games_to_scrape <-
     schedule |>
@@ -53,28 +54,28 @@ update_fieldhockey <- function(league = "usports") {
   all_player_box <- dplyr::bind_rows(all_player_box, existing_player_box) |> distinct()
   all_pbp <- dplyr::bind_rows(all_pbp, existing_pbp) |> distinct()
 
-  readr::write_csv(all_team_box, paste0("data/", league, "/", league, "_team_box.csv"))
-  readr::write_csv(all_player_box, paste0("data/", league, "/", league, "_player_box.csv"))
-  readr::write_csv(all_pbp, paste0("data/", league, "/", league, "_pbp.csv"))
+  readr::write_csv(all_team_box, paste0("data/", league, "_team_box/", league, "_team_box_", current_season, ".csv"))
+  readr::write_csv(all_player_box, paste0("data/", league, "_player_box/", league, "_player_box_", current_season, ".csv"))
+  readr::write_csv(all_pbp, paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
 
   piggyback::pb_upload(
-    file = paste0("data/", league, "/", league, "_team_box_", current_season, ".csv"),
+    file = paste0("data/", league, "_team_box/", league, "_team_box_", current_season, ".csv"),
     repo = "uwaggs/usports-data",
-    tag = "fieldhockey",
+    tag = paste0(league, "_team_box"),
     overwrite = TRUE
   )
 
   piggyback::pb_upload(
-    file = paste0("data/", league, "/", league, "_player_box_", current_season, ".csv"),
+    file = paste0("data/", league, "_player_box/", league, "_player_box_", current_season, ".csv"),
     repo = "uwaggs/usports-data",
-    tag = "fieldhockey",
+    tag = paste0(league, "_player_box"),
     overwrite = TRUE
   )
 
   piggyback::pb_upload(
-    file = paste0("data/", league, "/", league, "_pbp_", current_season, ".csv"),
+    file = paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"),
     repo = "uwaggs/usports-data",
-    tag = "fieldhockey",
+    tag = paste0(league, "_pbp"),
     overwrite = TRUE
   )
 }

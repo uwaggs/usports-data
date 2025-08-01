@@ -78,12 +78,7 @@ upload_to_release <- function(files,
 
 add_info <- function(df, link) {
 
-  # Extract game ID from the link
-  start_string <- "boxscores/"
-  end_string <- ".xml"
-  pattern <- paste0("b(?<=", start_string, ").*?(?=", end_string, ")")
-
-  game_id <- stringr::str_extract(link, pattern)
+  game_id <- basename(link) |> stringr::str_remove("\\.xml")
 
   pattern_2 <- glue::glue("(?<={league}/)[^/]+")
   # Extract season from the link
@@ -110,3 +105,7 @@ add_info <- function(df, link) {
 
   return(df)
 }
+
+
+read_file <- purrr::possibly(readr::read_csv, otherwise = tibble::tibble())
+

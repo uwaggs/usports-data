@@ -1,3 +1,5 @@
+source("R/utils.R")
+
 leagues <- c("mice", "wice")
 
 for(league in leagues) {
@@ -72,5 +74,3 @@ sapply(
     overwrite = TRUE
   )
 )
-
-
