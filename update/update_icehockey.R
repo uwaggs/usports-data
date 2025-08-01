@@ -1,6 +1,6 @@
-update_hockey <- function(league) {
+update_icehockey <- function(league = "usports") {
 
-  current_year <- as.integer(format(Sys.Date(), "%Y")) - 1
+  current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
   current_season <- dplyr::if_else(
     current_month <= 6,
@@ -29,11 +29,10 @@ update_hockey <- function(league) {
       ) |>
       dplyr::pull(box_scores)
 
-    all_team_box <- data.frame()
     all_player_box <- data.frame()
     all_pbp <- data.frame()
 
-    for(link in head(sample(games_to_scrape))) {
+    for(link in games_to_scrape) {
       webpage <- tryCatch({
         rvest::read_html(link)
       }, error = function(e) {
