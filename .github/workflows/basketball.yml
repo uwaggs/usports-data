@@ -27,6 +27,8 @@ jobs:
             any::piggyback
       - name: usportsR Installation
         run: Rscript -e 'remotes::install_github("uwaggs/usportsscraper")'
+        env:
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update results
         env:
