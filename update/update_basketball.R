@@ -34,7 +34,8 @@ for(league in leagues) {
   all_player_box <- data.frame()
   all_pbp <- data.frame()
 
-  for(link in head(sample(games_to_scrape))) {
+  for(link in games_to_scrape) {
+    Sys.sleep(5)
     webpage <- tryCatch({
       rvest::read_html(link)
     }, error = function(e) {
@@ -43,9 +44,9 @@ for(league in leagues) {
 
   if(is.null(webpage)) next
 
-  team_box <- usportsscraper::scrape_bkb_team_box_score(html = webpage) |>  add_info(link)
-  player_box <- usportsscraper::scrape_bkb_player_box_score(html = webpage) |> add_info(link)
-  pbp <- usportsscraper::scrape_bkb_play_by_play(html = webpage) |> add_info(link)
+  team_box <- usportsscraper::scrape_bkb_team_box_score_safe(html = webpage) |>  add_info(link)
+  player_box <- usportsscraper::scrape_bkb_player_box_score_safe(html = webpage) |> add_info(link)
+  pbp <- usportsscraper::scrape_bkb_play_by_play_safe(html = webpage) |> add_info(link)
 
   all_team_box <- dplyr::bind_rows(all_team_box, team_box)
   all_player_box <- dplyr::bind_rows(all_player_box, player_box)
