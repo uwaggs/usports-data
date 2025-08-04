@@ -23,6 +23,7 @@ for(league in leagues) {
   all_pbp <- data.frame()
 
   for(link in links) {
+    Sys.sleep(5)
     webpage <- tryCatch({
       rvest::read_html(link)
     }, error = function(e) {

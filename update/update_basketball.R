@@ -34,7 +34,8 @@ for(league in leagues) {
   all_player_box <- data.frame()
   all_pbp <- data.frame()
 
-  for(link in head(sample(games_to_scrape))) {
+  for(link in games_to_scrape) {
+    Sys.sleep(5)
     webpage <- tryCatch({
       rvest::read_html(link)
     }, error = function(e) {
