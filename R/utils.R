@@ -80,28 +80,43 @@ add_info <- function(df, link) {
 
   game_id <- basename(link) |> stringr::str_remove("\\.xml")
 
+  df$date <- stringr::str_extract(game_id, "\\d{8}") |> lubridate::ymd()
+  df$sport <- sport
+  df$link <- link
+
+  date <- as.Date(date)
+
   pattern_2 <- glue::glue("(?<={league}/)[^/]+")
   # Extract season from the link
   season <- stringr::str_extract(link, pattern_2)
-  season <- ifelse(stringr::str_length(season) > 7, stringr::str_sub(season, 1, 7), season)
-  ifelse(
-    stringr::str_length(season) == 4 & stringr::str_detect(season, "^[0-9]{4}$"),
-    stringr::str_c(
-        as.character(as.integer(season) - 1),
-        "-",
-        stringr::str_sub(season, 3, 4)
+  season <-
+    dplyr::case_when(
+    stringr::str_length(season) == 4 & stringr::str_detect(season, "^[0-9]{4}$") & lubridate::month(date) > 8 ~ stringr::str_c(
+      as.character(as.integer(season) - 1),
+      "-",
+      stringr::str_sub(season, 3, 4)
     ),
-    season
+    stringr::str_length(season) == 4 & stringr::str_detect(season, "^[0-9]{4}$") & lubridate::month(date) <= 8 ~ stringr::str_c(
+      season,
+      "-",
+      stringr::str_sub(as.character(as.integer(season) + 1), 3, 4)
+    )
   )
+  #   ifelse(
+  #   stringr::str_length(season) == 4 & stringr::str_detect(season, "^[0-9]{4}$"),
+  #   stringr::str_c(
+  #       as.character(as.integer(season) - 1),
+  #       "-",
+  #       stringr::str_sub(season, 3, 4)
+  #   ),
+  #   season
+  # )
 
   sport <- stringr::str_extract(link, "(?<=sports/)[a-z]+(?=/)")
 
   # Add game_id and season to the dataframe
   df$game_id <- game_id
   df$season <- season
-  df$date <- stringr::str_extract(game_id, "\\d{8}") |> lubridate::ymd()
-  df$sport <- sport
-  df$link <- link
 
   return(df)
 }
