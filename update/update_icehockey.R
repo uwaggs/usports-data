@@ -16,6 +16,14 @@ update_icehockey <- function(league = "usports") {
       season = current_season
     )
 
+    if (!dir.exists("data/{league}_player_box")) {
+      dir.create("data/{league}_player_box")
+    }
+
+    if (!dir.exists("data/{league}_pbp")) {
+      dir.create("data/{league}_pbp")
+    }
+
     existing_player_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_player_box/", league, "_player_box_", current_season,".csv"))
     existing_pbp <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_pbp/", league, "_pbp_", current_season,".csv"))
 
@@ -33,16 +41,18 @@ update_icehockey <- function(league = "usports") {
     all_pbp <- data.frame()
 
     for(link in games_to_scrape) {
-      webpage <- tryCatch({
-        rvest::read_html(link)
-      }, error = function(e) {
-        return(NULL)
-      })
+      Sys.sleep(11)
 
-      if(is.null(webpage)) next
+      content = httr::GET(link, httr::user_agent("httr"))
+      if (content$status_code != 200) {
+        cat("Failed to retrieve:", link, "\nstatus code:", content$status_code)
+        next
+      }
 
-      player_box <- usportsscraper::scrape_ice_player_box_score(html = webpage) |> add_info(link)
-      pbp <- usportsscraper::scrape_ice_play_by_play(html = webpage) |> add_info(link)
+      webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
+
+      player_box <- usportsscraper::scrape_ice_player_box_score_safe(html = webpage) |> add_info(link)
+      pbp <- usportsscraper::scrape_ice_play_by_play_safe(html = webpage) |> add_info(link)
 
       all_player_box <- dplyr::bind_rows(all_player_box, player_box)
       all_pbp <- dplyr::bind_rows(all_pbp, pbp)

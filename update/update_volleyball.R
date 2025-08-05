@@ -17,6 +17,18 @@ update_volleyball <- function(league = "usports") {
       season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
     )
 
+    if (!dir.exists("data/{league}_team_box")) {
+      dir.create("data/{league}_team_box")
+    }
+
+    if (!dir.exists("data/{league}_player_box")) {
+      dir.create("data/{league}_player_box")
+    }
+
+    if (!dir.exists("data/{league}_pbp")) {
+      dir.create("data/{league}_pbp")
+    }
+
     existing_team_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_team_box/", league, "_team_box_", current_season, ".csv"))
     existing_player_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_player_box/", league, "_player_box_", current_season, ".csv"))
     existing_pbp <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
@@ -36,13 +48,15 @@ update_volleyball <- function(league = "usports") {
     all_pbp <- data.frame()
 
     for(link in games_to_scrape) {
-      webpage <- tryCatch({
-        rvest::read_html(link)
-      }, error = function(e) {
-        return(NULL)
-      })
+      Sys.sleep(11)
 
-      if(is.null(webpage)) next
+      content = httr::GET(link, httr::user_agent("httr"))
+      if (content$status_code != 200) {
+        cat("Failed to retrieve:", link, "\nstatus code:", content$status_code)
+        next
+      }
+
+      webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
 
       team_box <- usportsscraper::scrape_vb_team_box_score(html = webpage) |>  add_info(link)
       player_box <- usportsscraper::scrape_vb_player_box_score(html = webpage) |> add_info(link)
