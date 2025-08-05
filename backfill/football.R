@@ -1,7 +1,5 @@
 library(usportsscraper)
 
-
-# get game id's
 leagues <- "fball"
 
 for(league in leagues) {
@@ -11,6 +9,38 @@ for(league in leagues) {
     tag = "schedules",
     dest = "data/schedules"
   )
+
+  if (!dir.exists("data/{league}_all_returns")) {
+    dir.create("data/{league}_team_box")
+  }
+
+  if (!dir.exists("data/{league}_all_kicking")) {
+    dir.create("data/{league}_player_box")
+  }
+
+  if (!dir.exists("data/{league}_all_offence")) {
+    dir.create("data/{league}_pbp")
+  }
+
+  if (!dir.exists("data/{league}_all_defence")) {
+    dir.create("data/{league}_team_box")
+  }
+
+  if (!dir.exists("data/{league}_all_drive_summaries")) {
+    dir.create("data/{league}_player_box")
+  }
+
+  if (!dir.exists("data/{league}_all_scoring_summaries")) {
+    dir.create("data/{league}_pbp")
+  }
+
+  if (!dir.exists("data/{league}_all_pbp")) {
+    dir.create("data/{league}_team_box")
+  }
+
+  if (!dir.exists("data/{league}_all_team")) {
+    dir.create("data/{league}_player_box")
+  }
 
   schedule <- read_file(paste0("data/schedules/", league, "_schedules.csv"))
 
@@ -30,22 +60,24 @@ for(league in leagues) {
 
 
   for(link in links) {
-    webpage <- tryCatch({
-      rvest::read_html(link)
-    }, error = function(e) {
-      return(NULL)
-    })
+    Sys.sleep(11)
 
-    if(is.null(link)) next
+    content = httr::GET(link, httr::user_agent("httr"))
+    if (content$status_code != 200) {
+      cat("Failed to retrieve:", link, "\nstatus code:", content$status_code)
+      next
+    }
 
-    returns <- usportsscraper::scrape_fb_returns(html = webpage) |> add_info(link)
-    kicking <- usportsscraper::scrape_fb_kicking(html = webpage) |> add_info(link)
-    offence <- usportsscraper::scrape_fb_offence(html = webpage) |> add_info(link)
-    defence <- usportsscraper::scrape_fb_defence(html = webpage) |> add_info(link)
-    drive_summaries <- usportsscraper::scrape_fb_drive_summary(html = webpage) |> add_info(link)
-    scoring_summaries <- usportsscraper::scrape_fb_scoring_summary(html = webpage) |> add_info(link)
-    pbp <- usportsscraper::scrape_fb_play_by_play(html = webpage) |> add_info(link)
-    team <- usportsscraper::scrape_fb_team(html = webpage) |> add_info(link)
+    webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
+
+    returns <- usportsscraper::scrape_fb_returns_safe(html = webpage) |> add_info(link)
+    kicking <- usportsscraper::scrape_fb_kicking_safe(html = webpage) |> add_info(link)
+    offence <- usportsscraper::scrape_fb_offence_safe(html = webpage) |> add_info(link)
+    defence <- usportsscraper::scrape_fb_defence_safe(html = webpage) |> add_info(link)
+    drive_summaries <- usportsscraper::scrape_fb_drive_summary_safe(html = webpage) |> add_info(link)
+    scoring_summaries <- usportsscraper::scrape_fb_scoring_summary_safe(html = webpage) |> add_info(link)
+    pbp <- usportsscraper::scrape_fb_play_by_play_safe(html = webpage) |> add_info(link)
+    team <- usportsscraper::scrape_fb_team_safe(html = webpage) |> add_info(link)
 
     all_returns <- dplyr::bind_rows(all_returns, returns)
     all_kicking <- dplyr::bind_rows(all_kicking, kicking)
@@ -58,7 +90,7 @@ for(league in leagues) {
   }
 
   all_returns |>
-    dplyr::mutate(path = stringr::str_glue("data/{league}/returns/{league}_returns_{season}.csv")) |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}_returns/{league}_returns_{season}.csv")) |>
     dplyr::group_by(season) |>
     dplyr::group_split() |>
     purrr::walk(~ {
@@ -67,7 +99,7 @@ for(league in leagues) {
     })
 
   all_kicking |>
-    dplyr::mutate(path = stringr::str_glue("data/{league}/kicking/{league}_kicking_{season}.csv")) |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}_kicking/{league}_kicking_{season}.csv")) |>
     dplyr::group_by(season) |>
     dplyr::group_split() |>
     purrr::walk(~ {
@@ -76,7 +108,7 @@ for(league in leagues) {
     })
 
   all_offence |>
-    dplyr::mutate(path = stringr::str_glue("data/{league}/offence/{league}_offence_{season}.csv")) |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}_offence/{league}_offence_{season}.csv")) |>
     dplyr::group_by(season) |>
     dplyr::group_split() |>
     purrr::walk(~ {
@@ -85,7 +117,7 @@ for(league in leagues) {
     })
 
   all_defence |>
-    dplyr::mutate(path = stringr::str_glue("data/{league}/defence/{league}_defence_{season}.csv")) |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}_defence/{league}_defence_{season}.csv")) |>
     dplyr::group_by(season) |>
     purrr::walk(~ {
       fs::dir_create(dirname(.x$path[1]))
@@ -93,7 +125,7 @@ for(league in leagues) {
     })
 
   all_drive_summaries |>
-    dplyr::mutate(path = stringr::str_glue("data/{league}/drive_summaries/{league}_drive_summaries_{season}.csv")) |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}_drive_summaries/{league}_drive_summaries_{season}.csv")) |>
     dplyr::group_by(season) |>
     dplyr::group_split() |>
     purrr::walk(~ {
@@ -102,7 +134,7 @@ for(league in leagues) {
     })
 
   all_scoring_summaries |>
-    dplyr::mutate(path = stringr::str_glue("data/{league}/scoring_summaries/{league}_scoring_summaries_{season}.csv")) |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}_scoring_summaries/{league}_scoring_summaries_{season}.csv")) |>
     dplyr::group_by(season) |>
     dplyr::group_split() |>
     purrr::walk(~ {
@@ -111,7 +143,7 @@ for(league in leagues) {
     })
 
   all_pbp |>
-    dplyr::mutate(path = stringr::str_glue("data/{league}/pbp/{league}_pbp_{season}.csv")) |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}_pbp/{league}_pbp_{season}.csv")) |>
     dplyr::group_by(season) |>
     dplyr::group_split() |>
     purrr::walk(~ {
@@ -120,91 +152,91 @@ for(league in leagues) {
     })
 
   all_team |>
-    dplyr::mutate(path = stringr::str_glue("data/{league}/team/{league}_team_{season}.csv")) |>
+    dplyr::mutate(path = stringr::str_glue("data/{league}_team/{league}_team_{season}.csv")) |>
     dplyr::group_by(season) |>
     dplyr::group_split() |>
     purrr::walk(~ {
       fs::dir_create(dirname(.x$path[1]))
       readr::write_csv(.x, .x$path[1])
     })
+
+  sapply(
+    unique(all_returns$season), \(x)
+    piggyback::pb_upload(
+      file = glue::glue("data/{league}_returns/{league}_returns_{x}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_team_box"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_kicking$season), \(x)
+    piggyback::pb_upload(
+      file = glue::glue("data/{league}_kicking/{league}_kicking_{x}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_kicking"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_offence$season), \(x)
+    piggyback::pb_upload(
+      file = glue::glue("data/{league}_offence/{league}_offence_{x}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_offence"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_defence$season), \(x)
+    piggyback::pb_upload(
+      file = glue::glue("data/{league}_defence/{league}_defence_{x}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_defence"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_drive_summaries$season), \(x)
+    piggyback::pb_upload(
+      file = glue::glue("data/{league}_drive_summaries/{league}_drive_summaries_{x}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_drive_summaries"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_scoring_summaries$season), \(x)
+    piggyback::pb_upload(
+      file = glue::glue("data/{league}_scoring_summaries/{league}_scoring_summaries_{x}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_scoring_summaries"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_pbp$season), \(x)
+    piggyback::pb_upload(
+      file = glue::glue("data/{league}_pbp/{league}_pbp_{x}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_pbp"),
+      overwrite = TRUE
+    )
+  )
+
+  sapply(
+    unique(all_team$season), \(x)
+    piggyback::pb_upload(
+      file = glue::glue("data/{league}_team/{league}_team_{x}.csv"),
+      repo = "uwaggs/usports-data",
+      tag = paste0(league, "_team"),
+      overwrite = TRUE
+    )
+  )
 }
-
-sapply(
-  unique(all_returns$season), \(x)
-  piggyback::pb_upload(
-    file = glue::glue("data/{league}/returns/{league}_returns_{x}.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_team_box"),
-    overwrite = TRUE
-  )
-)
-
-sapply(
-  unique(all_kicking$season), \(x)
-  piggyback::pb_upload(
-    file = glue::glue("data/{league}/kicking/{league}_kicking_{x}.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_kicking"),
-    overwrite = TRUE
-  )
-)
-
-sapply(
-  unique(all_offence$season), \(x)
-  piggyback::pb_upload(
-    file = glue::glue("data/{league}/offence/{league}_offence_{x}.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_offence"),
-    overwrite = TRUE
-  )
-)
-
-sapply(
-  unique(all_defence$season), \(x)
-  piggyback::pb_upload(
-    file = glue::glue("data/{league}/defence/{league}_defence_{x}.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_defence"),
-    overwrite = TRUE
-  )
-)
-
-sapply(
-  unique(all_drive_summaries$season), \(x)
-  piggyback::pb_upload(
-    file = glue::glue("data/{league}/drive_summaries/{league}_drive_summaries_{x}.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_drive_summaries"),
-    overwrite = TRUE
-  )
-)
-
-sapply(
-  unique(all_scoring_summaries$season), \(x)
-  piggyback::pb_upload(
-    file = glue::glue("data/{league}/scoring_summaries/{league}_scoring_summaries_{x}.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_scoring_summaries"),
-    overwrite = TRUE
-  )
-)
-
-sapply(
-  unique(all_pbp$season), \(x)
-  piggyback::pb_upload(
-    file = glue::glue("data/{league}/pbp/{league}_pbp_{x}.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_pbp"),
-    overwrite = TRUE
-  )
-)
-
-sapply(
-  unique(all_team$season), \(x)
-  piggyback::pb_upload(
-    file = glue::glue("data/{league}/team/{league}_team_{x}.csv"),
-    repo = "uwaggs/usports-data",
-    tag = paste0(league, "_team"),
-    overwrite = TRUE
-  )
-)

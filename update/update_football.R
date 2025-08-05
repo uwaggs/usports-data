@@ -14,6 +14,39 @@ update_football <- function(league = "usports") {
       sport = league,
       season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
     )
+
+    if (!dir.exists("data/{league}_all_returns")) {
+      dir.create("data/{league}_team_box")
+    }
+
+    if (!dir.exists("data/{league}_all_kicking")) {
+      dir.create("data/{league}_player_box")
+    }
+
+    if (!dir.exists("data/{league}_all_offence")) {
+      dir.create("data/{league}_pbp")
+    }
+
+    if (!dir.exists("data/{league}_all_defence")) {
+      dir.create("data/{league}_team_box")
+    }
+
+    if (!dir.exists("data/{league}_all_drive_summaries")) {
+      dir.create("data/{league}_player_box")
+    }
+
+    if (!dir.exists("data/{league}_all_scoring_summaries")) {
+      dir.create("data/{league}_pbp")
+    }
+
+    if (!dir.exists("data/{league}_all_pbp")) {
+      dir.create("data/{league}_team_box")
+    }
+
+    if (!dir.exists("data/{league}_all_team")) {
+      dir.create("data/{league}_player_box")
+    }
+
     existing_returns <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_returns/", league, "_returns_", current_season, ".csv"))
     existing_kicking <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_kicking/", league, "_kicking_", current_season, ".csv"))
     existing_offence <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_offence/", league, "_offence_", current_season, ".csv"))
@@ -44,22 +77,24 @@ update_football <- function(league = "usports") {
     all_team <- data.frame()
 
     for(link in games_to_scrape) {
-      webpage <- tryCatch({
-        rvest::read_html(link)
-      }, error = function(e) {
-        return(NULL)
-      })
+      Sys.sleep(11)
 
-      if(is.null(webpage)) next
+      content = httr::GET(link, httr::user_agent("httr"))
+      if (content$status_code != 200) {
+        cat("Failed to retrieve:", link, "\nstatus code:", content$status_code)
+        next
+      }
 
-      returns <- usportsscraper::scrape_fb_returns(html = webpage) |> add_info(link)
-      kicking <- usportsscraper::scrape_fb_kicking(html = webpage) |> add_info(link)
-      offence <- usportsscraper::scrape_fb_offence(html = webpage) |> add_info(link)
-      defence <- usportsscraper::scrape_fb_defence(html = webpage) |> add_info(link)
-      drive_summaries <- usportsscraper::scrape_fb_drive_summary(html = webpage) |> add_info(link)
-      scoring_summaries <- usportsscraper::scrape_fb_scoring_summary(html = webpage) |> add_info(link)
-      pbp <- usportsscraper::scrape_fb_play_by_play(html = webpage) |> add_info(link)
-      team <- usportsscraper::scrape_fb_team(html = webpage) |> add_info(link)
+      webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
+
+      returns <- usportsscraper::scrape_fb_returns_safe(html = webpage) |> add_info(link)
+      kicking <- usportsscraper::scrape_fb_kicking_safe(html = webpage) |> add_info(link)
+      offence <- usportsscraper::scrape_fb_offence_safe(html = webpage) |> add_info(link)
+      defence <- usportsscraper::scrape_fb_defence_safe(html = webpage) |> add_info(link)
+      drive_summaries <- usportsscraper::scrape_fb_drive_summary_safe(html = webpage) |> add_info(link)
+      scoring_summaries <- usportsscraper::scrape_fb_scoring_summary_safe(html = webpage) |> add_info(link)
+      pbp <- usportsscraper::scrape_fb_play_by_play_safe(html = webpage) |> add_info(link)
+      team <- usportsscraper::scrape_fb_team_safe(html = webpage) |> add_info(link)
 
       all_returns <- dplyr::bind_rows(all_returns, returns)
       all_kicking <- dplyr::bind_rows(all_kicking, kicking)
@@ -83,11 +118,11 @@ update_football <- function(league = "usports") {
     readr::write_csv(all_returns, paste0("data/", league, "_returns/", league, "_returns_", current_season, ".csv"))
     readr::write_csv(all_kicking, paste0("data/", league, "_kicking/", league, "_kicking_", current_season, ".csv"))
     readr::write_csv(all_offence, paste0("data/", league, "_offence/", league, "_offence_", current_season, ".csv"))
-    readr::write_csv(all_defence, paste0("data/", league, "/", league, "_defence_", current_season, ".csv"))
-    readr::write_csv(all_drive_summaries, paste0("data/", league, "/", league, "_drive_summaries_", current_season, ".csv"))
-    readr::write_csv(all_scoring_summaries, paste0("data/", league, "/", league, "_scoring_summaries_", current_season, ".csv"))
-    readr::write_csv(all_pbp, paste0("data/", league, "/", league, "_pbp_", current_season, ".csv"))
-    readr::write_csv(all_team, paste0("data/", league, "/", league, "_team_", current_season, ".csv"))
+    readr::write_csv(all_defence, paste0("data/", league, "_defence/", league, "_defence_", current_season, ".csv"))
+    readr::write_csv(all_drive_summaries, paste0("data/", league, "_drive_summmaries/", league, "_drive_summaries_", current_season, ".csv"))
+    readr::write_csv(all_scoring_summaries, paste0("data/", league, "_scoring_summaries/", league, "_scoring_summaries_", current_season, ".csv"))
+    readr::write_csv(all_pbp, paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
+    readr::write_csv(all_team, paste0("data/", league, "_team/", league, "_team_", current_season, ".csv"))
 
     piggyback::pb_upload(
       file = paste0("data/", league, "_returns/", league, "_returns_", current_season, ".csv"),
