@@ -16,6 +16,19 @@ update_soccer <- function(league = "usports") {
       sport = league,
       season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
     )
+
+    if (!dir.exists("data/{league}_team_box")) {
+      dir.create("data/{league}_team_box")
+    }
+
+    if (!dir.exists("data/{league}_player_box")) {
+      dir.create("data/{league}_player_box")
+    }
+
+    if (!dir.exists("data/{league}_pbp")) {
+      dir.create("data/{league}_pbp")
+    }
+
     existing_team_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_team_box/", league, "_team_box_", current_season, ".csv"))
     existing_player_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_player_box/", league, "_player_box_", current_season, ".csv"))
     existing_pbp <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
@@ -35,17 +48,19 @@ update_soccer <- function(league = "usports") {
     all_pbp <- data.frame()
 
     for(link in games_to_scrape) {
-      webpage <- tryCatch({
-        rvest::read_html(link)
-      }, error = function(e) {
-        return(NULL)
-      })
+      Sys.sleep(11)
 
-      if(is.null(webpage)) next
+      content = httr::GET(link, httr::user_agent("httr"))
+      if (content$status_code != 200) {
+        cat("Failed to retrieve:", link, "\nstatus code:", content$status_code)
+        next
+      }
 
-      team_box <- usportsscraper::scrape_soc_team_box_score(html = webpage) |>  add_info(link)
-      player_box <- usportsscraper::scrape_soc_player_box_score(html = webpage) |> add_info(link)
-      pbp <- usportsscraper::scrape_soc_play_by_play(html = webpage) |> add_info(link)
+      webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
+
+      team_box <- usportsscraper::scrape_soc_team_box_score_safe(html = webpage) |>  add_info(link)
+      player_box <- usportsscraper::scrape_soc_player_box_score_safe(html = webpage) |> add_info(link)
+      pbp <- usportsscraper::scrape_soc_play_by_play_safe(html = webpage) |> add_info(link)
 
       all_team_box <- dplyr::bind_rows(all_team_box, team_box)
       all_player_box <- dplyr::bind_rows(all_player_box, player_box)
