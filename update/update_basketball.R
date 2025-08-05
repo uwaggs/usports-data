@@ -17,8 +17,8 @@ for(league in leagues) {
     season = current_season
   )
 
-  if (!dir.exists("data/{league}/team_box")) {
-    dir.create("data/{league}/team_box")
+  if (!dir.exists("data/{league}_team_box")) {
+    dir.create("data/{league}_team_box")
   }
 
   if (!dir.exists("data/{league}_player_box")) {
@@ -48,7 +48,7 @@ for(league in leagues) {
   all_pbp <- data.frame()
 
   for(link in games_to_scrape) {
-    Sys.sleep(5)
+    Sys.sleep(11)
 
     content = httr::GET(link, httr::user_agent("httr"))
     if (content$status_code != 200) {
@@ -56,7 +56,7 @@ for(league in leagues) {
       next
     }
 
-  webpage <- rvest::read_html(content)
+    webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
 
   team_box <- usportsscraper::scrape_bkb_team_box_score_safe(html = webpage) |>  add_info(link)
   player_box <- usportsscraper::scrape_bkb_player_box_score_safe(html = webpage) |> add_info(link)

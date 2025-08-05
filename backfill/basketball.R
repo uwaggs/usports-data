@@ -11,8 +11,8 @@ for(league in leagues) {
     dest = "data/schedules"
   )
 
-  if (!dir.exists("data/{league}/team_box")) {
-    dir.create("data/{league}/team_box")
+  if (!dir.exists("data/{league}_team_box")) {
+    dir.create("data/{league}_team_box")
   }
 
   if (!dir.exists("data/{league}_player_box")) {
@@ -35,14 +35,15 @@ for(league in leagues) {
   all_pbp <- data.frame()
 
   for(link in links) {
-    Sys.sleep(5)
-    webpage <- tryCatch({
-      rvest::read_html(link)
-    }, error = function(e) {
-      return(NULL)
-    })
+    Sys.sleep(11)
 
-    if(is.null(webpage)) next
+    content = httr::GET(link, httr::user_agent("httr"))
+    if (content$status_code != 200) {
+      cat("Failed to retrieve:", link, "\nstatus code:", content$status_code)
+      next
+    }
+
+    webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
 
     team_box <- usportsscraper::scrape_bkb_team_box_score_safe(html = webpage) |> add_info(link)
     player_box <- usportsscraper::scrape_bkb_player_box_score_safe(html = webpage) |> add_info(link)
@@ -83,7 +84,6 @@ for(league in leagues) {
       fs::dir_create(dirname(.x$path[1]))
       readr::write_csv(.x, .x$path[1])
     })
-}
 
   sapply(
     unique(all_team_box$season), \(x)
@@ -114,6 +114,4 @@ for(league in leagues) {
       overwrite = TRUE
     )
   )
-
-
-
+}
