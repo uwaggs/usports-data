@@ -33,13 +33,15 @@ update_fieldhockey <- function(league = "usports") {
   all_pbp <- data.frame()
 
   for(link in games_to_scrape) {
-    webpage <- tryCatch({
-      rvest::read_html(link)
-    }, error = function(e) {
-      return(NULL)
-    })
+    Sys.sleep(11)
 
-    if(is.null(webpage)) next
+    content = httr::GET(link, httr::user_agent("httr"))
+    if (content$status_code != 200) {
+      cat("Failed to retrieve:", link, "\nstatus code:", content$status_code)
+      next
+    }
+
+    webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
 
     team_box <- usportsscraper::scrape_fh_team_box_score(html = webpage) |> add_info(link)
     player_box <- usportsscraper::scrape_fh_player_box_score(html = webpage) |> add_info(link)
