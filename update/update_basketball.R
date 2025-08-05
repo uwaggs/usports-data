@@ -49,13 +49,14 @@ for(league in leagues) {
 
   for(link in games_to_scrape) {
     Sys.sleep(5)
-    webpage <- tryCatch({
-      rvest::read_html(link)
-    }, error = function(e) {
-      return(NULL)
-    })
 
-  if(is.null(webpage)) next
+    content = httr::GET(link, httr::user_agent("httr"))
+    if (content$status_code != 200) {
+      cat("Failed to retrieve:", link, "\nstatus code:", content$status_code)
+      next
+    }
+
+  webpage <- rvest::read_html(content)
 
   team_box <- usportsscraper::scrape_bkb_team_box_score_safe(html = webpage) |>  add_info(link)
   player_box <- usportsscraper::scrape_bkb_player_box_score_safe(html = webpage) |> add_info(link)
