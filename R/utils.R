@@ -102,15 +102,6 @@ add_info <- function(df, link) {
       stringr::str_sub(as.character(as.integer(season) + 1), 3, 4)
     )
   )
-  #   ifelse(
-  #   stringr::str_length(season) == 4 & stringr::str_detect(season, "^[0-9]{4}$"),
-  #   stringr::str_c(
-  #       as.character(as.integer(season) - 1),
-  #       "-",
-  #       stringr::str_sub(season, 3, 4)
-  #   ),
-  #   season
-  # )
 
   sport <- stringr::str_extract(link, "(?<=sports/)[a-z]+(?=/)")
 
