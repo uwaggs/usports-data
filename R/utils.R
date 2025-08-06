@@ -87,7 +87,9 @@ add_info <- function(df, link) {
 
   pattern_2 <- glue::glue("(?<={league}/)[^/]+")
   # Extract season from the link
-  season <- stringr::str_extract(link, pattern_2)
+  season <- stringr::str_extract(link, pattern_2) |>
+    stringr::str_remove_all("[a-zA-Z]")
+
   season <-
     dplyr::case_when(
     stringr::str_length(season) == 4 & stringr::str_detect(season, "^[0-9]{4}$") & lubridate::month(df$date) > 8 ~ stringr::str_c(
@@ -99,7 +101,8 @@ add_info <- function(df, link) {
       season,
       "-",
       stringr::str_sub(as.character(as.integer(season) + 1), 3, 4)
-    )
+    ),
+    .default = season
   )
 
   sport <- stringr::str_extract(link, "(?<=sports/)[a-z]+(?=/)")
