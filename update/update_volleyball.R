@@ -1,5 +1,4 @@
 source("R/utils.R")
-update_volleyball <- function(league = "usports") {
 
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
@@ -96,4 +95,3 @@ update_volleyball <- function(league = "usports") {
       overwrite = TRUE
     )
   }
-}

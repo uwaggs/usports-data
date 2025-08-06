@@ -1,3 +1,4 @@
+source("R/utils.R")
 leagues <- c("fh")
 
 for(league in leagues) {

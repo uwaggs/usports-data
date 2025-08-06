@@ -1,5 +1,4 @@
-library(usportsscraper)
-
+source("R/utils.R")
 leagues <- "fball"
 
 for(league in leagues) {

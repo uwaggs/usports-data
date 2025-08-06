@@ -1,6 +1,4 @@
 source("R/utils.R")
-update_soccer <- function(league = "usports") {
-
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
   current_season <- dplyr::if_else(
@@ -96,4 +94,4 @@ update_soccer <- function(league = "usports") {
       overwrite = TRUE
     )
   }
-}
+

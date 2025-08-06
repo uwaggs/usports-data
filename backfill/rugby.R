@@ -1,3 +1,4 @@
+source("R/utils.R")
 library(usportsscaper)
 
 for(link in links) {
