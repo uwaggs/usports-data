@@ -1,5 +1,5 @@
 source("R/utils.R")
-update_fieldhockey <- function(league = "usports") {
+
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
   current_season <- dplyr::if_else(
@@ -80,4 +80,4 @@ update_fieldhockey <- function(league = "usports") {
     tag = paste0(league, "_pbp"),
     overwrite = TRUE
   )
-}
+
