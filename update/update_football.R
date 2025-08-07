@@ -15,38 +15,6 @@ source("R/utils.R")
       season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
     )
 
-    if (!dir.exists("data/{league}_all_returns")) {
-      dir.create("data/{league}_team_box")
-    }
-
-    if (!dir.exists("data/{league}_all_kicking")) {
-      dir.create("data/{league}_player_box")
-    }
-
-    if (!dir.exists("data/{league}_all_offence")) {
-      dir.create("data/{league}_pbp")
-    }
-
-    if (!dir.exists("data/{league}_all_defence")) {
-      dir.create("data/{league}_team_box")
-    }
-
-    if (!dir.exists("data/{league}_all_drive_summaries")) {
-      dir.create("data/{league}_player_box")
-    }
-
-    if (!dir.exists("data/{league}_all_scoring_summaries")) {
-      dir.create("data/{league}_pbp")
-    }
-
-    if (!dir.exists("data/{league}_all_pbp")) {
-      dir.create("data/{league}_team_box")
-    }
-
-    if (!dir.exists("data/{league}_all_team")) {
-      dir.create("data/{league}_player_box")
-    }
-
     existing_returns <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_returns/", league, "_returns_", current_season, ".csv"))
     existing_kicking <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_kicking/", league, "_kicking_", current_season, ".csv"))
     existing_offence <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_offence/", league, "_offence_", current_season, ".csv"))

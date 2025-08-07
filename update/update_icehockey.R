@@ -16,14 +16,6 @@ source("R/utils.R")
       season = current_season
     )
 
-    if (!dir.exists("data/{league}_player_box")) {
-      dir.create("data/{league}_player_box")
-    }
-
-    if (!dir.exists("data/{league}_pbp")) {
-      dir.create("data/{league}_pbp")
-    }
-
     existing_player_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_player_box/", league, "_player_box_", current_season,".csv"))
     existing_pbp <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_pbp/", league, "_pbp_", current_season,".csv"))
 
