@@ -9,18 +9,6 @@ for(league in leagues) {
     dest = "data/schedules"
   )
 
-  if (!dir.exists("data/{league}_team_box")) {
-    dir.create("data/{league}_team_box")
-  }
-
-  if (!dir.exists("data/{league}_player_box")) {
-    dir.create("data/{league}_player_box")
-  }
-
-  if (!dir.exists("data/{league}_pbp")) {
-    dir.create("data/{league}_pbp")
-  }
-
   schedule <- read_file(paste0("data/schedules/", league, "_schedules.csv"))
 
   links <- schedule |>

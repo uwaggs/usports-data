@@ -11,18 +11,6 @@ for(league in leagues) {
 
   schedule <- read_file(paste0("data/schedules/", league, "_schedules.csv"))
 
-  if (!dir.exists("data/{league}_team_box")) {
-    dir.create("data/{league}_team_box")
-  }
-
-  if (!dir.exists("data/{league}_player_box")) {
-    dir.create("data/{league}_player_box")
-  }
-
-  if (!dir.exists("data/{league}_pbp")) {
-    dir.create("data/{league}_pbp")
-  }
-
   links <- schedule |>
     dplyr::filter(box_scores != "", !is.na(box_scores)) |>
     dplyr::pull(box_scores) |>

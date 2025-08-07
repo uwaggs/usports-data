@@ -9,38 +9,6 @@ for(league in leagues) {
     dest = "data/schedules"
   )
 
-  if (!dir.exists("data/{league}_all_returns")) {
-    dir.create("data/{league}_team_box")
-  }
-
-  if (!dir.exists("data/{league}_all_kicking")) {
-    dir.create("data/{league}_player_box")
-  }
-
-  if (!dir.exists("data/{league}_all_offence")) {
-    dir.create("data/{league}_pbp")
-  }
-
-  if (!dir.exists("data/{league}_all_defence")) {
-    dir.create("data/{league}_team_box")
-  }
-
-  if (!dir.exists("data/{league}_all_drive_summaries")) {
-    dir.create("data/{league}_player_box")
-  }
-
-  if (!dir.exists("data/{league}_all_scoring_summaries")) {
-    dir.create("data/{league}_pbp")
-  }
-
-  if (!dir.exists("data/{league}_all_pbp")) {
-    dir.create("data/{league}_team_box")
-  }
-
-  if (!dir.exists("data/{league}_all_team")) {
-    dir.create("data/{league}_player_box")
-  }
-
   schedule <- read_file(paste0("data/schedules/", league, "_schedules.csv"))
 
   links <- schedule |>
@@ -118,6 +86,7 @@ for(league in leagues) {
   all_defence |>
     dplyr::mutate(path = stringr::str_glue("data/{league}_defence/{league}_defence_{season}.csv")) |>
     dplyr::group_by(season) |>
+    dplyr::group_split() |>
     purrr::walk(~ {
       fs::dir_create(dirname(.x$path[1]))
       readr::write_csv(.x, .x$path[1])
