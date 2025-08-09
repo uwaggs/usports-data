@@ -42,3 +42,38 @@ initialize_schedule <- function() {
     sys.sleep(10) # Sleep to avoid hitting the server too hard
   }
 }
+
+initialize_schedule <- function() {
+  seasons <- c("2009-10", "2010-11", "2011-12", "2012-13", "2013-14",
+               "2014-15", "2015-16", "2016-17", "2017-18", "2018-19",
+               "2019-20", "2020-21", "2021-22", "2022-23", "2023-24")
+
+  leagues <- c("mbkb", "wbkb", "fh", "fball", "msoc", "wsoc", "mice", "wice", "mvball", "wvball")
+
+  all_schedule <- data.frame()
+
+  for (league in leagues) {
+    for(season in seasons) {
+      schedule <- usportsscraper::scrape_schedule(league, season)
+      all_schedule <- dplyr::bind_rows(all_schedule, schedule)
+    }
+    all_schedule |>
+      dplyr::mutate(path = stringr::str_glue("data/{league}_schedule/{league}_schedule_{season}.csv")) |>
+      dplyr::group_by(season) |>
+      dplyr::group_split() |>
+      purrr::walk( ~ {
+        fs::dir_create(dirname(.x$path[1]))
+        readr::write_csv(.x, .x$path[1])
+      })
+
+    sapply(
+      unique(all_schedule$season), \(x)
+      piggyback::pb_upload(
+        file = glue::glue("data/{league}_schedule/{league}_schedule_{x}.csv"),
+        repo = "uwaggs/usports-data",
+        tag = paste0(league, "_schedule"),
+        overwrite = TRUE
+      )
+    )
+  }
+}
