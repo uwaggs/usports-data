@@ -1,7 +1,10 @@
-### Backfill
+# usports-data
 
-1.  Get schedules:
-    -   Write a script called `initialize_schedules.R` that scrapes the schedules for all of the sports using `usportsscraper::scrape_schedule`
-2.  Run each sports script
+Data repository for sports data from [University Sports](https://en.usports.ca/landing/index) (U SPORTS), the governing body of university sport in Canada. Data will be updated periodically throughout the season.
 
-I've scaffolded what I think the workflow should look like. Please fill in the blanks with volleyball to get it working.
+## Usage
+
+This data can be accessed in two ways:
+
+-  You can manually download the `.csv` files via the release pages
+-  You can use the functions from the [`usportsR`](https://uwaggs.github.io/usportsR/)/[`usportspy`](https://github.com/uwaggs/usportspy/wiki) packages to load the data as data frames.
