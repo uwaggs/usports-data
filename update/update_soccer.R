@@ -10,7 +10,7 @@ source("R/utils.R")
   leagues <- c("msoc", "wsoc")
 
   for(league in leagues) {
-    schedule <- usportsscraper::scrape_schedule(
+    schedule <- usportsscraper::scrape_schedule_gamelog(
       sport = league,
       season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
     )
