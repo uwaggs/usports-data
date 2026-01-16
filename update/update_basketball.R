@@ -12,7 +12,7 @@ current_season <- dplyr::if_else(
 leagues <- c("mbkb", "wbkb")
 
 for(league in leagues) {
-  schedule <- usportsscraper::scrape_schedule(
+  schedule <- usportsscraperprototype::scrape_schedule_gamelog(
     league,
     season = current_season
   )
