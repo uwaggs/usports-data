@@ -11,7 +11,7 @@ source("R/utils.R")
   leagues <- c("mice", "wice")
 
   for(league in leagues) {
-    schedule <- usportsscraper::scrape_schedule(
+    schedule <- usportsscraperprototype::scrape_schedule_gamelog(
       league,
       season = current_season
     )
