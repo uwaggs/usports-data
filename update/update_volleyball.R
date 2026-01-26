@@ -12,9 +12,9 @@ source("R/utils.R")
 
   for(league in leagues) {
     schedule <- usportsscraper::scrape_schedule_gamelog(
-      sport = league,
-      season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
-    )
+    league,
+    season = current_season
+  )
 
     existing_team_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_team_box/", league, "_team_box_", current_season, ".csv"))
     existing_player_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_player_box/", league, "_player_box_", current_season, ".csv"))
