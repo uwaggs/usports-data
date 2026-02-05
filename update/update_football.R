@@ -10,10 +10,10 @@ source("R/utils.R")
   leagues <- c("fball")
 
   for(league in leagues) {
-    schedule <- usportsscraper::scrape_schedule(
-      sport = league,
-      season = paste0(current_year = 1, "-", substr(current_year, 3, 4))
-    )
+    schedule <- usportsscraper::scrape_schedule_gamelog(
+    league,
+    season = current_season
+  )
 
     existing_returns <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_returns/", league, "_returns_", current_season, ".csv"))
     existing_kicking <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/data/", league, "_kicking/", league, "_kicking_", current_season, ".csv"))
