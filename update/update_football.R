@@ -1,4 +1,105 @@
 source("R/utils.R")
+normalize_returns <- function(df) {
+  cols_to_double <- c("number", "yards", "average", "longest", "touchdowns")
+
+  df %>%
+    mutate(across(any_of(cols_to_double), as.double))
+}
+
+normalize_kicking <- function(df) {
+  df |>
+    mutate(
+      field_goals_made=as.double(field_goals_made),
+      field_goals_attempted=as.double(field_goals_attempted),
+      longest=as.double(longest),
+      extra_points_made=as.double(extra_points_made),
+      extra_points_attempted=as.double(extra_points_attempted),
+      return_yards=as.double(return_yards),
+      points=as.double(points),
+      number=as.double(number),
+      yards=as.double(yards),
+      average=as.double(average),
+      touchbacks=as.double(touchbacks),
+      inside_20=as.double(inside_20),
+      out_of_bounds=as.double(out_of_bounds)
+    )
+}
+normalize_offence<-function(df){
+  df |>
+    mutate(
+      passing_completions=as.double(passing_completions),
+      passing_attempts=as.double(passing_attempts),
+      passing_yards=as.double(passing_yards),
+      passing_longest=as.double(passing_longest),
+      passing_touchdowns=as.double(passing_touchdowns),
+      passing_interceptions=as.double(passing_interceptions),
+      passing_rtg=as.double(passing_rtg),
+      rushing_attempts=as.double(rushing_attempts),
+      rushing_yards=as.double(rushing_yards),
+      rushing_longest=as.double(rushing_longest),
+      rushing_touchdowns=as.double(rushing_touchdowns),
+      rushing_average=as.double(rushing_average),
+      receiving_receptions=as.double(receiving_receptions),
+      receiving_yards=as.double(receiving_yards),
+      receiving_longest=as.double(receiving_longest),
+      receiving_touchdowns=as.double(receiving_touchdowns),
+      receiving_average=as.double(receiving_average),
+      fumble_number=as.double(fumble_number),
+      fumbles_lost=as.double(fumbles_lost)
+    )
+}
+normalize_defence<-function(df){
+  cols_to_convert<-c("solo","sack_assists","total","sacks","sack_yards","tackles_for_loss","tackles_for_loss_yards","forced_fumbles","fumble_recovery","fumble_recovery_yards_gained","interceptions","interception_yards_gained","passes_broken_up","blocked_kicks","quarterback_hurries")
+  df <- df %>%
+    mutate(across(any_of(cols_to_convert), as.double))
+
+}
+normalize_drive_summaries <- function(df) {
+
+  if (is.null(df) || nrow(df) == 0) {
+    return(df)
+  }
+
+  numeric_cols <- c("quarter", "plays", "yards", "drive_id")
+
+  time_cols <- c("start", "possessions")
+
+  df <- df |>
+    mutate(
+      # Force all time-like columns to character
+      across(any_of(time_cols), ~ as.character(.x))
+    ) |>
+    mutate(
+      across(any_of(numeric_cols), as.double)
+    ) |>
+    mutate(
+      drive_start = as.numeric(as.difftime(start, format = "%M:%S"))
+    )
+
+  return(df)
+}
+
+normalize_scoring_summaries<-function(df){
+  cols_to_convert<-c("prd","away_score","home_score")
+  df <- df %>%
+    mutate(across(any_of(cols_to_convert), as.double))
+  df<-df|>
+    mutate(time=as.numeric(as.difftime(time, format = "%M:%S")))
+}
+normalize_pbp<-function(df){
+  cols_to_convert<-c("down", "quarter", "drive_id", "kick", "kickoff", "punt", "pass_complete", "pass_incomplete", "rush","sack","fumble","fumble_forced","touchdown","timeout","penalty","intercepted","fumble_recovered","rouge_point")
+  df <- df %>%
+    mutate(across(any_of(cols_to_convert), as.double))
+  df<-df|>
+    mutate(drive_start=as.numeric(as.difftime(drive_start, format = "%M:%S")))
+}
+normalize_team<-function(df){
+  cols_to_convert<-c("first_downs", "passing", "rushing", "penalty", "total_offense", "total_offensive_plays","average_gain_per_play","net_yards_passing","completions","attempts","net_yards_per_pass_play","number_of_sacked","yards_lost_from_sacked","had_intercepted","net_yards_rushing","rushing_attempts","average_gain_per_rush","number_of_punts","yards_punted","average","total_return_yards","number_of_punt_returns","yards_from_punt_returns","number_of_kickoff_returns","yards_from_kickoff_returns","number_of_interception_returns","yards_from_interception_returns","number_of_penalties","yards_from_penalties","fumbles_number","fumbles_lost","number_of_sacks","yards_lost_from_sacks","number_of_interceptions","yards_from_interceptions")
+  df <- df %>%
+    mutate(across(any_of(cols_to_convert), as.double))
+  df<-df|>
+    mutate(time_of_possession=as.numeric(as.difftime(time_of_possession, format = "%M:%S")))
+}
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
   current_season <- dplyr::if_else(
@@ -73,7 +174,19 @@ source("R/utils.R")
       all_pbp <- dplyr::bind_rows(all_pbp, pbp)
       all_team <- dplyr::bind_rows(all_team, team)
     }
+    all_kicking<-normalize_kicking(all_kicking)
 
+    all_offence<-normalize_offence(all_offence)
+
+    all_defence<-normalize_defence(all_defence)
+
+    all_drive_summaries<-normalize_drive_summaries(all_drive_summaries)
+
+    all_scoring_summaries<-normalize_scoring_summaries(all_scoring_summaries)
+
+    all_pbp<-normalize_pbp(all_pbp)
+
+    all_team<-normalize_team(all_team)
     all_returns <- dplyr::bind_rows(all_returns, existing_returns) |> distinct()
     all_kicking <- dplyr::bind_rows(all_kicking, existing_kicking) |> distinct()
     all_offence <- dplyr::bind_rows(all_offence, existing_offence) |> distinct()

@@ -1,4 +1,83 @@
 source("R/utils.R")
+normalize_player_box <- function(df) {
+
+  double_cols <- c(
+    "shots",
+    "shots_on_goal",
+    "goals",
+    "assists",
+    "shots_on_goal_against",
+    "goals_against",
+    "saves",
+    "minutes_played"
+  )
+
+  time_cols <- c(
+    "card_time_received",
+    "card_two_time_received",
+    "card_three_time_received"
+  )
+
+  df |>
+    dplyr::mutate(
+
+      # --- Convert numeric columns ---
+      dplyr::across(
+        dplyr::any_of(double_cols),
+        as.double
+      ),
+
+      # --- Clean time columns and keep as character ---
+      dplyr::across(
+        dplyr::any_of(time_cols),
+        ~ {
+          x <- as.character(.)
+          x <- stringr::str_trim(x)
+          x[x == ""] <- NA_character_
+
+          # Keep only first two time segments (MM:SS)
+          x <- sub("^([0-9]+:[0-9]+):.*$", "\\1", x)
+
+          x
+        }
+      )
+    )
+}
+normalize_pbp <- function(df) {
+
+  double_cols <- c(
+    "halves",
+    "score_away",
+    "score_home"
+  )
+
+  time_cols <- c("time")
+
+  df |>
+    dplyr::mutate(
+
+      # --- Convert numeric columns ---
+      dplyr::across(
+        dplyr::any_of(double_cols),
+        as.double
+      ),
+
+      # --- Clean time column and keep as character ---
+      dplyr::across(
+        dplyr::any_of(time_cols),
+        ~ {
+          x <- as.character(.)
+          x <- stringr::str_trim(x)
+          x[x == ""] <- NA_character_
+
+          # Convert MM:SS:00 -> MM:SS
+          x <- sub("^([0-9]+:[0-9]+):.*$", "\\1", x)
+
+          x
+        }
+      )
+    )
+}
   current_year <- as.integer(format(Sys.Date(), "%Y"))
   current_month <- lubridate::month(Sys.Date())
   current_season <- dplyr::if_else(
@@ -52,7 +131,9 @@ source("R/utils.R")
       all_player_box <- dplyr::bind_rows(all_player_box, player_box)
       all_pbp <- dplyr::bind_rows(all_pbp, pbp)
     }
-
+    all_team_box<-normalize_team_box(all_team_box)
+    all_player_box<-normalize_player_box(all_player_box)
+    all_pbp<-normalize_pbp(all_pbp)
     all_team_box <- dplyr::bind_rows(all_team_box, existing_team_box) |> distinct()
     all_player_box <- dplyr::bind_rows(all_player_box, existing_player_box) |> distinct()
     all_pbp <- dplyr::bind_rows(all_pbp, existing_pbp) |> distinct()
