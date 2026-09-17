@@ -131,7 +131,9 @@ normalize_pbp <- function(df) {
       all_player_box <- dplyr::bind_rows(all_player_box, player_box)
       all_pbp <- dplyr::bind_rows(all_pbp, pbp)
     }
-
+    all_team_box<-normalize_team_box(all_team_box)
+    all_player_box<-normalize_player_box(all_player_box)
+    all_pbp<-normalize_pbp(all_pbp)
     all_team_box <- dplyr::bind_rows(all_team_box, existing_team_box) |> distinct()
     all_player_box <- dplyr::bind_rows(all_player_box, existing_player_box) |> distinct()
     all_pbp <- dplyr::bind_rows(all_pbp, existing_pbp) |> distinct()
