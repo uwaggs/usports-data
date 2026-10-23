@@ -118,4 +118,59 @@ add_info <- function(df, link) {
 
 
 read_file <- purrr::possibly(readr::read_csv, otherwise = tibble::tibble())
+library(dplyr)
+library(readr)
 
+join_schedule <- function(schedule, full_schedule, league) {
+  
+  # Ensure dates have the same type
+  schedule <- schedule %>%
+    mutate(date = as.character(date)) %>%
+    select(-any_of("..1")) %>%
+    filter(grepl("-", date) | is.na(date))
+  
+  full_schedule <- full_schedule %>%
+    mutate(date = as.character(date)) %>%
+    select(-any_of("..1"))
+  
+  # Extract scores from schedule
+  schedule_scores <- schedule %>%
+    filter(!is.na(date), !is.na(game_id)) %>%
+    select(date, game_id, home_score, away_score) %>%
+    distinct(date, game_id, .keep_all = TRUE) %>%
+    rename(
+      schedule_home_score = home_score,
+      schedule_away_score = away_score
+    )
+  
+  # Update scores in full_schedule
+  full_schedule_updated <- full_schedule %>%
+    left_join(schedule_scores, by = c("date", "game_id")) %>%
+    mutate(
+      home_score = coalesce(schedule_home_score, home_score),
+      away_score = coalesce(schedule_away_score, away_score)
+    ) %>%
+    select(-schedule_home_score, -schedule_away_score)
+  
+  # Add games present in schedule but absent from full_schedule
+  schedule_only <- schedule %>%
+    filter(!is.na(date), !is.na(game_id)) %>%
+    anti_join(
+      full_schedule %>% filter(!is.na(date), !is.na(game_id)),
+      by = c("date", "game_id")
+    )
+  
+  # Combine, filling missing columns with NA
+  combined_schedule <- bind_rows(
+    full_schedule_updated,
+    schedule_only
+  )
+  
+  # Save CSV
+  write_csv(
+    combined_schedule,
+   paste0("data/schedules/, league, "_schedule.csv")
+  )
+  
+  return(combined_schedule)
+}

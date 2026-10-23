@@ -16,7 +16,16 @@ for(league in leagues) {
     league,
     season = current_season
   )
-
+    if(league=="mbkb"){
+    schedule_two=basketball_schedule("m")
+  }
+  if(league=="wbkb"){
+    schedule_two=basketball_schedule("w")
+    }
+  
+  join_schedule(schedule,schedule_two,league)
+  
+ 
   existing_team_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_team_box/", league, "_team_box_", current_season,".csv"))
   existing_player_box <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_player_box/", league, "_player_box_", current_season,".csv"))
   existing_pbp <- read_file(paste0("https://github.com/uwaggs/usports-data/releases/download/", league, "_pbp/", league, "_pbp_", current_season,".csv"))
@@ -63,8 +72,14 @@ readr::write_csv(all_team_box, paste0("data/", league, "_team_box/", league, "_t
 readr::write_csv(all_player_box, paste0("data/", league, "_player_box/", league, "_player_box_", current_season, ".csv"))
 readr::write_csv(all_pbp, paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
 
+  piggyback::pb_upload(
+  file = paste0("data/",league,"_scehdule/",league, "_schedule",".csv"),
+  repo = "uwaggs/usports-data",
+  tag = "new_schedules,
+  overwrite = TRUE
+)
 piggyback::pb_upload(
-  file = paste0("data/", league, "_team_box/", league, "_team_box_", current_season, ".csv"),
+  file = paste0("data/schedules/, league, "_schedule.csv"),
   repo = "uwaggs/usports-data",
   tag = paste0(league, "_team_box"),
   overwrite = TRUE
