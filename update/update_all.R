@@ -1,7 +1,7 @@
 
 # update_all.R
 
-library(usportsScraper)
+library(usportsscraper)
 
 
 source("update_basketball.R")
