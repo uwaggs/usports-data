@@ -115,7 +115,30 @@ for(league in leagues) {
   all_pbp <- dplyr::bind_rows(all_pbp, normalize_pbp(existing_pbp)) |> distinct()
   
   
-  readr::write_csv(all_player_box, paste0(league, "_player_box_",current_season,".csv"))
-  readr::write_csv(all_pbp, paste0(league, "_pbp_",current_season,".csv"))
+
+readr::write_csv(all_player_box, paste0("data/", league, "_player_box/", league, "_player_box_", current_season, ".csv"))
+readr::write_csv(all_pbp, paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
+
+  piggyback::pb_upload(
+  file = paste0("data/",league,"_scehdule/",league, "_schedule",".csv"),
+  repo = "uwaggs/usports-data",
+  tag = "new_schedules,
+  overwrite = TRUE
+)
+
+
+piggyback::pb_upload(
+  file = paste0("data/", league, "_player_box/", league, "_player_box_", current_season, ".csv"),
+  repo = "uwaggs/usports-data",
+  tag = paste0(league, "_player_box"),
+  overwrite = TRUE
+)
+
+piggyback::pb_upload(
+  file = paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"),
+  repo = "uwaggs/usports-data",
+  tag = paste0(league, "_pbp"),
+  overwrite = TRUE
+)
 }
 
