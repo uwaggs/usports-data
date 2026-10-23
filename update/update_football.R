@@ -1,4 +1,5 @@
 source("R/utils.R")
+pacman::p_load(tidyverse, piggyback, rvest)
 normalize_returns <- function(df) {
   cols_to_double <- c("number", "yards", "average", "longest", "touchdowns")
 
@@ -191,7 +192,7 @@ normalize_team<-function(df){
     all_kicking <- dplyr::bind_rows(all_kicking, existing_kicking) |> distinct()
     all_offence <- dplyr::bind_rows(all_offence, existing_offence) |> distinct()
     all_defence <- dplyr::bind_rows(all_defence, existing_defence) |> distinct()
-    all_drive_summaries <- dplyr::bind_rows(all_drive_summaries, existing_drive_summaries) |> distinct()
+    all_drive_summaries <- dplyr::bind_rows(all_drive_summaries, normalize_drive_summaries(existing_drive_summaries)) |> distinct()
     all_scoring_summaries <- dplyr::bind_rows(all_scoring_summaries, existing_scoring_summaries) |> distinct()
     all_pbp <- dplyr::bind_rows(all_pbp, existing_pbp) |> distinct()
     all_team <- dplyr::bind_rows(all_team, existing_team) |> distinct()
