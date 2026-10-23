@@ -169,7 +169,7 @@ join_schedule <- function(schedule, full_schedule, league) {
   # Save CSV
   write_csv(
     combined_schedule,
-   paste0("data/schedules/, league, "_schedule.csv")
+   paste0("data/schedules/", league, "_schedule.csv")
   )
   
   return(combined_schedule)
