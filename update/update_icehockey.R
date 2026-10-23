@@ -120,7 +120,7 @@ readr::write_csv(all_player_box, paste0("data/", league, "_player_box/", league,
 readr::write_csv(all_pbp, paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
 
   piggyback::pb_upload(
-  file = paste0("data/",league,"_scehdule/",league, "_schedule",".csv"),
+  file = paste0("data/schedules/, league, "_schedule.csv"),
   repo = "uwaggs/usports-data",
   tag = "new_schedules,
   overwrite = TRUE
