@@ -53,9 +53,9 @@ for(league in leagues) {
     
     webpage <- rvest::read_html(content, encoding = "ISO-8859-1")
     
-    team_box <- scrape_vb_team_box_score(html = webpage) |>  add_info(link)
-    player_box <- scrape_vb_player_box_score(html = webpage) |> add_info(link)
-    pbp <- scrape_vb_play_by_play(html = webpage) |> add_info(link)
+    team_box <- usportsscraper::scrape_vb_team_box_score(html = webpage) |>  add_info(link)
+    player_box <-usportsscraper::scrape_vb_player_box_score(html = webpage) |> add_info(link)
+    pbp <- usportsscraper::scrape_vb_play_by_play(html = webpage) |> add_info(link)
     
     all_team_box <- dplyr::bind_rows(all_team_box, team_box)
     all_player_box <- dplyr::bind_rows(all_player_box, player_box)
@@ -69,5 +69,36 @@ for(league in leagues) {
   readr::write_csv(all_team_box, paste0( league, "_team_box_",current_season,".csv"))
   readr::write_csv(all_player_box, paste0(league, "_player_box_",current_season,".csv"))
   readr::write_csv(all_pbp, paste0(league, "_pbp_",current_season,".csv"))
+  
+readr::write_csv(all_team_box, paste0("data/", league, "_team_box/", league, "_team_box_", current_season, ".csv"))
+readr::write_csv(all_player_box, paste0("data/", league, "_player_box/", league, "_player_box_", current_season, ".csv"))
+readr::write_csv(all_pbp, paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"))
+
+
+piggyback::pb_upload(
+  file = paste0("data/schedules/", league, "_schedule.csv"),
+  repo = "uwaggs/usports-data",
+  tag = "new_schedules",
+  overwrite = TRUE
+)
+piggyback::pb_upload(
+  file = paste0("data/", league, "_player_box/", league, "_team_box_", current_season, ".csv"),
+  repo = "uwaggs/usports-data",
+  tag = paste0(league, "_team_box"),
+  overwrite = TRUE
+)
+piggyback::pb_upload(
+  file = paste0("data/", league, "_player_box/", league, "_player_box_", current_season, ".csv"),
+  repo = "uwaggs/usports-data",
+  tag = paste0(league, "_player_box"),
+  overwrite = TRUE
+)
+
+piggyback::pb_upload(
+  file = paste0("data/", league, "_pbp/", league, "_pbp_", current_season, ".csv"),
+  repo = "uwaggs/usports-data",
+  tag = paste0(league, "_pbp"),
+  overwrite = TRUE
+)
 }
 
